@@ -43,7 +43,7 @@ class Game
 
     createEnemy(){
         var enemy = new Enemy(this.canvas, this.c, this.waypoints);
-        enemy.position.x = this.waypoints[0].getCentrePosition().x;
+        enemy.position.x = this.waypoints[0].getCentrePosition().x - 50;
         enemy.position.y = this.waypoints[0].getCentrePosition().y;
         enemy.radius = 15;
         this.enemies.push(enemy);
@@ -126,7 +126,12 @@ class Game
 
     update(){
         requestAnimationFrame(this.update.bind(this));
-        this.enemies.forEach(element => element.update());
+        this.enemies = this.enemies.filter(element => !element.isDead);
+
+        this.enemies.forEach(element => {
+            element.update();
+        });
+    
         this.draw();
     }
 }
