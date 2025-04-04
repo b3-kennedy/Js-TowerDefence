@@ -79,6 +79,15 @@ export default class Game
                 this.shopGrid[i][j] = shopElement;
             }
         }
+
+        canvas.addEventListener("mousedown", (event) =>{
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            this.selectItem(event,x,y, gridXSize, gridYSize);
+
+
+        });
         
         canvas.addEventListener('mousemove', (event) => {
             this.shopGrid.flat().forEach(element => {
@@ -95,6 +104,32 @@ export default class Game
                 }
             });
         });
+
+        //add items to the shop
+        var flatshop = this.shopGrid.flat();
+        for(var i = 0; i < flatshop.length; i++){
+            flatshop[i].item = i;
+            console.log(flatshop[i].item);
+        }
+
+    }
+
+    selectItem(event, x, y, gridXSize, gridYSize){
+
+        for(var i = 0; i < gridYSize; i++){
+            for(var j = 0; j < gridXSize; j++){
+                var gridElement = this.shopGrid[i][j];
+                var gridPos = this.shopGrid[i][j].position;
+                if (
+                    x > gridPos.x && x < gridPos.x + this.grid[i][j].size &&
+                    y > gridPos.y && y < gridPos.y + this.grid[i][j].size
+                ) 
+                {
+                    console.log(gridElement.item);
+
+                }               
+            }
+        }
     }
 
     createEnemy(){

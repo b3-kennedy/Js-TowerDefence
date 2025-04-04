@@ -8,6 +8,7 @@ export default class ShopGridElement{
         this.size = 50;
         this.position = new Vector(0.0);
         this.colour = Colours.shopColour;
+        this.item = null;
     }
 
     draw(){
