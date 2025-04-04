@@ -2,6 +2,8 @@ import GridElement from './gridelement.js';
 import Enemy from './enemy.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
+import Tower from './tower.js';
+import ShopGridElement from './shopgridelement.js';
 
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
@@ -10,24 +12,45 @@ console.log(c);
 
 
 
-class Game
+export default class Game
 {
     constructor(width, height, bgColour, canvas, context, gridSize){
         canvas.width = width;
         canvas.height = height;
 
-        c.fillStyle = bgColour;
-        c.fillRect(0,0,canvas.width,canvas.height);
 
-        this.width = width;
-        this.height = height;
+        this.shopArea = {
+            x: 4,
+            y: canvas.height-905,
+            width: 100,
+            height: 800
+        };
+
+
+
+        this.drawingArea = {
+            x: (canvas.width - 800) / 2,  // Centering
+            y: (canvas.height - 800) / 2,
+            width: 800,
+            height: 800
+        };
+
+        c.fillStyle = bgColour;
+        c.fillRect(this.drawingArea.x,this.drawingArea.y,this.drawingArea.width,this.drawingArea.height);
+
+
+
+        this.width = this.drawingArea.width;
+        this.height = this.drawingArea.height;
         this.bgColour = bgColour;
         this.canvas = canvas;
         this.c = context;
         this.grid = [];
+        this.shopGrid = [];
         this.gridSize = gridSize;
-        this.squareSize = this.width/this.gridSize;
+        this.squareSize = this.drawingArea.width/this.gridSize;
         this.enemies = [];
+        this.towers = [];
         this.waypoints = [];
 
         this.start();
@@ -38,35 +61,114 @@ class Game
         this.createGrid();
         this.createPath();
         this.createEnemy();
+        this.createShop();
         this.update();
     }
 
+    createShop(){
+        var size = (this.shopArea.width/2)+0.06; //0.06 to align to game view
+        var gridXSize = this.shopArea.width/size;
+        var gridYSize = this.shopArea.height/size;
+
+        for (let i = 0; i < gridYSize; i++) {
+            this.shopGrid[i] = [];
+            for (let j = 0; j < gridXSize; j++) {
+                var shopElement = new ShopGridElement(this.c, this.canvas);
+                shopElement.size = size;
+                shopElement.position = new Vector(this.shopArea.x + (j * size), this.shopArea.y + (i * size));
+                this.shopGrid[i][j] = shopElement;
+            }
+        }
+        
+        canvas.addEventListener('mousemove', (event) => {
+            this.shopGrid.flat().forEach(element => {
+                if (!element.isPath && !element.hasTower) {
+                    element.onMouseMove(event);
+                }
+            });
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            this.shopGrid.flat().forEach(element => {
+                if (!element.isPath && ! element.hasTower) {
+                    element.colour = Colours.shopColour;
+                }
+            });
+        });
+    }
+
     createEnemy(){
-        var enemy = new Enemy(this.canvas, this.c, this.waypoints);
-        enemy.position.x = this.waypoints[0].getCentrePosition().x - 50;
-        enemy.position.y = this.waypoints[0].getCentrePosition().y;
-        enemy.radius = 15;
-        this.enemies.push(enemy);
+
+        for(var i =0; i < 5; i++){
+            setTimeout(() => {
+                let enemy = new Enemy(this.canvas, this.c, this.waypoints, this.drawingArea);
+                enemy.position = new Vector(
+                    this.waypoints[0].getCentrePosition().x - 50,
+                    this.waypoints[0].getCentrePosition().y
+                );
+                enemy.radius = 15;
+                enemy.speed = 1;
+                this.enemies.push(enemy);
+            }, (i + 1) * 1000); // Spawns enemies 1 second apart
+        }
+
+    }
+
+    buildTowers(event, x, y){
+
+        for(var i = 0; i < this.gridSize; i++){
+            for(var j = 0; j < this.gridSize; j++){
+                var gridElement = this.grid[i][j];
+                var gridPos = this.grid[i][j].position;
+                if(!gridElement.isPath && !gridElement.hasTower){
+                    if (
+                        x > gridPos.x && x < gridPos.x + this.grid[i][j].size &&
+                        y > gridPos.y && y < gridPos.y + this.grid[i][j].size
+                    ) 
+                    {
+                        
+                        console.log(gridElement.position.x + "," + gridElement.position.y);
+                        var testTower = new Tower(this.canvas, this.c, this);
+                        testTower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
+                        testTower.enemies = this.enemies;
+                        this.towers.push(testTower);
+                        gridElement.hasTower = true;
+                        gridElement.colour = Colours.grass;
+                        return;
+                    }  
+                }
+             
+            }
+        }
     }
 
     createGrid(){
-        for (var i = 0; i < this.gridSize; i++) {  // Outer loop: Y-axis
-            this.grid[i] = []; // Create a new row
+        for (var i = 0; i < this.gridSize; i++) {
+            this.grid[i] = [];
             for (var j = 0; j < this.gridSize; j++) {  // Inner loop: X-axis
-                var newGridElement = new GridElement(c, canvas);
-                newGridElement.size = this.squareSize;
-                newGridElement.position.x = i * this.squareSize;  // j controls X
-                newGridElement.position.y = j * this.squareSize;  // i controls Y
+                var newGridElement = new GridElement(c, canvas, this.drawingArea);
+                newGridElement.size = this.squareSize+1; //+1 to remove white gaps between squares
+                newGridElement.position.x = this.drawingArea.x + (i * this.squareSize);
+                newGridElement.position.y = this.drawingArea.y + (j * this.squareSize);
                 newGridElement.colour = Colours.grass;
                 newGridElement.borderColour = 'black';
                 newGridElement.debug = false;
-                this.grid[i][j] = newGridElement; // Store in a 2D array
+                this.grid[i][j] = newGridElement;
             }
         }
 
+        canvas.addEventListener("mousedown", (event) =>{
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            this.buildTowers(event,x,y);
+
+
+        });
+
         canvas.addEventListener('mousemove', (event) => {
             this.grid.flat().forEach(element => {
-                if (!element.isPath) {
+                if (!element.isPath && !element.hasTower) {
                     element.onMouseMove(event);
                 }
             });
@@ -74,7 +176,7 @@ class Game
 
         canvas.addEventListener('mouseleave', () => {
             this.grid.flat().forEach(element => {
-                if (!element.isPath) {
+                if (!element.isPath && ! element.hasTower) {
                     element.colour = Colours.grass;
                 }
             });
@@ -120,23 +222,34 @@ class Game
     }
 
     draw(){
+
+
+
         this.grid.flat().forEach(element => element.draw());
         this.enemies.forEach(element => element.draw());
+        this.shopGrid.flat().forEach(element => element.draw());
+        this.towers.forEach(element => element.draw());
+
+        // c.fillStyle = this.bgColour;
+        // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);
     }
 
     update(){
         requestAnimationFrame(this.update.bind(this));
+        c.clearRect(0,0, canvas.width, canvas.height);
         this.enemies = this.enemies.filter(element => !element.isDead);
 
         this.enemies.forEach(element => {
             element.update();
         });
+
+        this.towers.forEach(element => {element.update()})
     
         this.draw();
     }
 }
 
-var game = new Game(800, 800, 'lightblue', canvas, c, 17)
+var game = new Game(1010, 1010, 'lightblue', canvas, c, 17)
 
 
 

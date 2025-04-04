@@ -1,7 +1,7 @@
 import Vector from './vector.js';
 
 export default class Enemy{
-    constructor(canvas, context, waypoints){
+    constructor(canvas, context, waypoints, drawingArea){
         this.radius = 10;
         this.position = new Vector(0,0);
         this.colour = 'blue';
@@ -11,14 +11,31 @@ export default class Enemy{
         this.velocity = new Vector(1,0);
         this.target = this.waypoints[1];
         this.waypointIndex = 1;
-        this.speed = 2;
+        this.speed = 1;
         this.finalDir = new Vector(1,0);
         this.isDead = false;
+        this.drawingArea = drawingArea;
+        this.health = 3;
         
     }
 
+    takeDamage(damage){
+        this.health -= damage;
+        if(this.health <= 0){
+            this.isDead = true;
+        }
+    }
+
+    isInDrawingArea(){
+        return (
+            this.position.x >= this.drawingArea.x && 
+            this.position.x < this.drawingArea.x + this.drawingArea.width && 
+            this.position.y >= this.drawingArea.y && 
+            this.position.y < this.drawingArea.y + this.drawingArea.height);
+    }
+
     draw(){
-        if(!this.isDead){
+        if(!this.isDead && this.isInDrawingArea()){
             this.c.beginPath();
             this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
             this.c.fillStyle = 'blue';

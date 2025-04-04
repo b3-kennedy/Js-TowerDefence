@@ -3,18 +3,21 @@ import Colours from './colours.js';
 
 
 export default class GridElement{
-    constructor(context, canvas){
+    constructor(context, canvas, drawingArea){
         this.size = 50;
         this.position = new Vector(0,0);
         this.colour = Colours.grass;
         this.selectedColour = 'blue';
         this.borderColour = 'black';
         this.borderWidth = 1;
+        this.outsideBorderWidth = 3; 
         this.name = "GridElement: " + "(" + this.position.x + "," + this.position.y + ")";
         this.c = context;
         this.canvas = canvas;
+        this.drawingArea = drawingArea;
         this.isPath = false;
         this.debug = false;
+        this.hasTower = false;
         
     }
 
@@ -38,23 +41,23 @@ export default class GridElement{
     }
 
     drawBorders(){
-        if(this.position.x == 0){ //left border
+        if(this.position.x == this.drawingArea.x){ //left border
             this.drawLeftBorder(this.position.x, this.position.y,);
         }
-        if(this.position.x == this.canvas.width - this.size){
+        if(this.position.x >= this.drawingArea.x + this.drawingArea.width - this.size){
             this.drawRightBorder(this.position.x, this.position.y);
         }
-        if(this.position.y == 0){
+        if(this.position.y == this.drawingArea.y){
             this.drawTopBorder(this.position.x, this.position.y);
         }
-        if(this.position.y == this.canvas.height - this.size){
+        if(this.position.y >= this.drawingArea.y  + this.drawingArea.height - this.size){
             this.drawBottomBorder(this.position.x, this.position.y);
         }
     }
 
     drawRightBorder(xpos, ypos){
         this.c.strokeStyle = this.borderColour;
-        this.c.lineWidth = this.borderWidth*3;
+        this.c.lineWidth = this.outsideBorderWidth;
         this.c.beginPath();
         this.c.moveTo(xpos + this.size, ypos);
         this.c.lineTo(xpos + this.size, ypos + this.size);
@@ -63,7 +66,7 @@ export default class GridElement{
 
     drawLeftBorder(xpos, ypos){
         this.c.strokeStyle = this.borderColour;
-        this.c.lineWidth = this.borderWidth*3;
+        this.c.lineWidth = this.outsideBorderWidth;
         this.c.beginPath();
         this.c.moveTo(xpos, ypos);
         this.c.lineTo(xpos, ypos+this.size);
@@ -72,7 +75,7 @@ export default class GridElement{
 
     drawTopBorder(xpos, ypos){
         this.c.strokeStyle = this.borderColour;
-        this.c.lineWidth = this.borderWidth*3;
+        this.c.lineWidth = this.outsideBorderWidth;
         this.c.beginPath();
         this.c.moveTo(xpos, ypos);
         this.c.lineTo(xpos+this.size, ypos);
@@ -81,7 +84,7 @@ export default class GridElement{
 
     drawBottomBorder(xpos, ypos){
         this.c.strokeStyle = this.borderColour;
-        this.c.lineWidth = this.borderWidth*3;
+        this.c.lineWidth = this.outsideBorderWidth;
         this.c.beginPath();
         this.c.moveTo(xpos, ypos + this.size);  // Move to the bottom-left corner (ypos + this.size)
         this.c.lineTo(xpos + this.size, ypos + this.size);  // Draw the line horizontally to the right
