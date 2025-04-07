@@ -1,7 +1,9 @@
+import Projectile from "./projectile.js";
 import Vector from "./vector.js";
 
-export default class Projectile{
-    constructor(canvas, context){
+export default class RocketProjectile extends Projectile{
+    constructor(canvas, context, game){
+        super(canvas,context);
         this.canvas = canvas;
         this.c = context;
 
@@ -13,17 +15,31 @@ export default class Projectile{
         this.damage = 1;
         this.isActive = true;
 
+        this.game = game;
+        this.radius = 50;
     }
 
     draw(){
         if(this.isActive && this.target && !this.target.isDead){
             this.c.beginPath();
-            this.c.arc(this.position.x,this.position.y, 3, 0, 360, false);
+            this.c.arc(this.position.x,this.position.y, 5, 0, 360, false);
             this.c.fillStyle = 'blue';
             this.c.fill();
         }
 
     }
+
+    doAoeDamage(){
+        var enemies = this.game.enemies;
+        for (let i = 0; i < enemies.length; i++) {
+            var distance = Vector.Distance(this.position, enemies[i].position);
+            if(distance <= this.radius){
+                enemies[i].takeDamage(this.damage);
+            }
+            
+        }        
+    }
+
 
     update(){
         if(!this.target) return;
@@ -37,7 +53,7 @@ export default class Projectile{
             this.position = Vector.Add(this.position, this.velocity);
     
             if(Vector.Distance(this.position, this.target.position) <= 10){
-                this.target.takeDamage(this.damage);
+                this.doAoeDamage();
                 this.isActive = false;
             }
         }

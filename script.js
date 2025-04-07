@@ -6,6 +6,7 @@ import ShopGridElement from './shopgridelement.js';
 import Tower from './tower.js';
 import LaserTower from './lasertower.js';
 import AttackSpeedTower from './attackspeedtower.js';
+import RocketTower from './rockettower.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -78,10 +79,12 @@ export default class Game
         var defaultTower = new Tower(this.canvas, this.c, this);
         var laserTower = new LaserTower(this.canvas, this.c, this);
         var attackSpeedTower = new AttackSpeedTower(this.canvas, this.c, this);
+        var rocketTower = new RocketTower(this.canvas, this.c, this);
         var shopItems = []
         shopItems.push(defaultTower);
         shopItems.push(laserTower);
         shopItems.push(attackSpeedTower);
+        shopItems.push(rocketTower);
 
         for (let i = 0; i < gridYSize; i++) {
             this.shopGrid[i] = [];
