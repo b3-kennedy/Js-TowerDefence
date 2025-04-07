@@ -9,13 +9,15 @@ export default class Tower{
         this.width = 25;
         this.height = 40;
         this.lastfireTime = 0;
-        this.fireRate = 1000;
+        this.baseFireRate = 1000;
+        this.fireRate = this.baseFireRate;
         this.enemies = [];
         this.target = null;
         this.game = game;
         this.radius = 250;
         this.projeciles = [];
         this.name = "Tower";
+        this.cost = 100;
 
         }
 
@@ -52,7 +54,7 @@ export default class Tower{
     }
 
     getTarget(){
-        let enemies = this.game.enemies;  // Get the latest enemy list
+        let enemies = this.game.enemies;
         if (enemies.length === 0) {
             this.target = null;
             return;
@@ -69,7 +71,6 @@ export default class Tower{
             }
         }
 
-        // Update target
         this.target = closestEnemy;
     }
 

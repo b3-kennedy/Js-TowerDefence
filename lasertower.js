@@ -1,13 +1,13 @@
 import Vector from "./vector.js";
-import Projectile from "./projectile.js";
 import Tower from "./tower.js";
 
 export default class LaserTower extends Tower{
     constructor(canvas, context, game){
         super(canvas, context, game);
-        this.fireRate = 100;
+        this.baseFireRate = 100;
         this.name = "Laser Tower";
         this.damage = 0.1;
+        this.cost = 500;
     }
 
     clone()

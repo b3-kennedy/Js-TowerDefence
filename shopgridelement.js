@@ -2,20 +2,36 @@ import Vector from "./vector.js";
 import Colours from "./colours.js";
 
 export default class ShopGridElement{
-    constructor(context, canvas){
+    constructor(context, canvas, game){
         this.c = context;
         this.canvas = canvas;
         this.size = 50;
         this.position = new Vector(0.0);
         this.colour = Colours.shopColour;
         this.item = null;
+        this.isSelected = false;
+        this.game = game;
     }
 
 
 
     draw(){
-        this.c.fillStyle = this.colour;
+
+        if(!this.isSelected){
+            this.c.fillStyle = this.colour;
+        }else{
+            this.c.fillStyle = Colours.selectedShopColour;
+        }
+
+        if(this.item){
+            if(this.game.money < this.item.cost){
+                this.c.fillStyle = 'red';
+            }
+        }
+
+
         this.c.fillRect(this.position.x, this.position.y, this.size, this.size);
+
 
         this.c.strokeStyle = 'black';
         this.c.borderWidth = 1;

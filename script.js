@@ -2,13 +2,14 @@ import GridElement from './gridelement.js';
 import Enemy from './enemy.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
+import ShopGridElement from './shopgridelement.js';
 import Tower from './tower.js';
 import LaserTower from './lasertower.js';
-import ShopGridElement from './shopgridelement.js';
+import AttackSpeedTower from './attackspeedtower.js';
+
 
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
-console.log(c);
 
 
 
@@ -54,7 +55,7 @@ export default class Game
         this.towers = [];
         this.waypoints = [];
         this.selectedTower = null;
-
+        this.money = 500;
         this.start();
     }
 
@@ -76,20 +77,20 @@ export default class Game
         //add items to the shop
         var defaultTower = new Tower(this.canvas, this.c, this);
         var laserTower = new LaserTower(this.canvas, this.c, this);
+        var attackSpeedTower = new AttackSpeedTower(this.canvas, this.c, this);
         var shopItems = []
         shopItems.push(defaultTower);
         shopItems.push(laserTower);
-
-        console.log(shopItems[1]);
+        shopItems.push(attackSpeedTower);
 
         for (let i = 0; i < gridYSize; i++) {
             this.shopGrid[i] = [];
             for (let j = 0; j < gridXSize; j++) {
-                var shopElement = new ShopGridElement(this.c, this.canvas);
+                var shopElement = new ShopGridElement(this.c, this.canvas, this);
                 shopElement.size = size;
                 shopElement.position = new Vector(this.shopArea.x + (j * size), this.shopArea.y + (i * size));
                 this.shopGrid[i][j] = shopElement;
-                var index = i * gridXSize + j;
+                var index = Math.round(i * gridXSize + j);
                 this.shopGrid[i][j].item = shopItems[index];
             }
         }
@@ -131,6 +132,7 @@ export default class Game
             for(var j = 0; j < gridXSize; j++){
                 var gridElement = this.shopGrid[i][j];
                 var gridPos = this.shopGrid[i][j].position;
+                gridElement.isSelected = false;
                 if (
                     x > gridPos.x && x < gridPos.x + this.grid[i][j].size &&
                     y > gridPos.y && y < gridPos.y + this.grid[i][j].size
@@ -138,6 +140,7 @@ export default class Game
                 {
                     if(gridElement.item){
                         this.selectedItem = gridElement.item;
+                        gridElement.isSelected = true;
                     }
 
                 }               
@@ -147,9 +150,9 @@ export default class Game
 
     createEnemy(){
 
-        for(var i =0; i < 5; i++){
+        for(var i =0; i < 10; i++){
             setTimeout(() => {
-                let enemy = new Enemy(this.canvas, this.c, this.waypoints, this.drawingArea);
+                let enemy = new Enemy(this.canvas, this.c, this.waypoints, this.drawingArea, this);
                 enemy.position = new Vector(
                     this.waypoints[0].getCentrePosition().x - 50,
                     this.waypoints[0].getCentrePosition().y
@@ -174,19 +177,35 @@ export default class Game
                         y > gridPos.y && y < gridPos.y + this.grid[i][j].size
                     ) 
                     {
-                        if(this.selectedItem){
+                        if(this.selectedItem && this.money >= this.selectedItem.cost){
                             var tower = this.selectedItem.clone();
                             tower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
                             tower.enemies = this.enemies;
                             this.towers.push(tower);
+                            this.updateAuraTowers();
                             gridElement.hasTower = true;
                             gridElement.colour = Colours.grass;
+                            this.alterMoney(-this.selectedItem.cost)
+                            this.selectedItem = null;
+                            
                             return;
                         }
 
                     }  
                 }
              
+            }
+        }
+    }
+
+    updateAuraTowers(){
+        if(this.towers.length == 0){
+            return;
+        }
+
+        for(let i = 0; i < this.towers.length; i++){
+            if(this.towers[i].isAura){
+                this.towers[i].applyBuff();
             }
         }
     }
@@ -270,6 +289,11 @@ export default class Game
         ];
     }
 
+    alterMoney(value){
+        this.money += value;
+        console.log(this.money);
+    }
+
     draw(){
 
 
@@ -278,6 +302,10 @@ export default class Game
         this.enemies.forEach(element => element.draw());
         this.shopGrid.flat().forEach(element => element.draw());
         this.towers.forEach(element => element.draw());
+
+        this.c.font = "16px Arial";  // Font size and type
+        this.c.fillStyle = "black";  // Text color
+        this.c.fillText(`$${this.money}`, 50,100, 100); 
 
         // c.fillStyle = this.bgColour;
         // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);

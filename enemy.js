@@ -1,7 +1,7 @@
 import Vector from './vector.js';
 
 export default class Enemy{
-    constructor(canvas, context, waypoints, drawingArea){
+    constructor(canvas, context, waypoints, drawingArea, game){
         this.radius = 10;
         this.position = new Vector(0,0);
         this.colour = 'blue';
@@ -15,7 +15,9 @@ export default class Enemy{
         this.finalDir = new Vector(1,0);
         this.isDead = false;
         this.drawingArea = drawingArea;
+        this.game = game;
         this.health = 3;
+        
         
     }
 
@@ -23,6 +25,7 @@ export default class Enemy{
         this.health -= damage;
         if(this.health <= 0){
             this.isDead = true;
+            this.game.alterMoney(100);
         }
     }
 
