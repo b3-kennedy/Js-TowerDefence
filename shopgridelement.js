@@ -11,6 +11,8 @@ export default class ShopGridElement{
         this.item = null;
     }
 
+
+
     draw(){
         this.c.fillStyle = this.colour;
         this.c.fillRect(this.position.x, this.position.y, this.size, this.size);
@@ -18,6 +20,44 @@ export default class ShopGridElement{
         this.c.strokeStyle = 'black';
         this.c.borderWidth = 1;
         this.c.strokeRect(this.position.x, this.position.y, this.size, this.size)
+
+        function wrapTextToTwoLines(ctx, text, maxWidth) {
+            let words = text.split(' ');
+            let line1 = '';
+            let line2 = '';
+        
+            for (let word of words) {
+                if (ctx.measureText(line1 + word + ' ').width <= maxWidth) {
+                    line1 += word + ' ';
+                } else if (ctx.measureText(line2 + word + ' ').width <= maxWidth) {
+                    line2 += word + ' ';
+                } else {
+                    break; // Stop if both lines can't take more
+                }
+            }
+        
+            return [line1.trim(), line2.trim()];
+        }
+
+        if(this.item){
+            this.c.fillStyle = 'white';
+            this.c.font = '12px Arial';
+            this.c.textAlign = 'center';
+            const rawText = this.item.name; // or any other string
+            const maxWidth = this.size - 10; // Padding from edges
+        
+            const [line1, line2] = wrapTextToTwoLines(this.c, rawText, maxWidth);
+            
+
+            
+
+            if(line2){
+                this.c.fillText(line1, this.position.x + this.size / 2, (this.position.y + this.size/2) - 5);
+                this.c.fillText(line2, this.position.x + this.size / 2, (this.position.y + this.size/2) + 10);
+            }else{
+                this.c.fillText(line1, this.position.x + this.size / 2, (this.position.y + this.size/2));
+            }
+        }
     }
 
     onMouseMove(event) {

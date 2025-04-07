@@ -3,6 +3,7 @@ import Enemy from './enemy.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
 import Tower from './tower.js';
+import LaserTower from './lasertower.js';
 import ShopGridElement from './shopgridelement.js';
 
 const canvas = document.querySelector('canvas');
@@ -52,6 +53,7 @@ export default class Game
         this.enemies = [];
         this.towers = [];
         this.waypoints = [];
+        this.selectedTower = null;
 
         this.start();
     }
@@ -70,6 +72,16 @@ export default class Game
         var gridXSize = this.shopArea.width/size;
         var gridYSize = this.shopArea.height/size;
 
+        
+        //add items to the shop
+        var defaultTower = new Tower(this.canvas, this.c, this);
+        var laserTower = new LaserTower(this.canvas, this.c, this);
+        var shopItems = []
+        shopItems.push(defaultTower);
+        shopItems.push(laserTower);
+
+        console.log(shopItems[1]);
+
         for (let i = 0; i < gridYSize; i++) {
             this.shopGrid[i] = [];
             for (let j = 0; j < gridXSize; j++) {
@@ -77,6 +89,8 @@ export default class Game
                 shopElement.size = size;
                 shopElement.position = new Vector(this.shopArea.x + (j * size), this.shopArea.y + (i * size));
                 this.shopGrid[i][j] = shopElement;
+                var index = i * gridXSize + j;
+                this.shopGrid[i][j].item = shopItems[index];
             }
         }
 
@@ -105,12 +119,9 @@ export default class Game
             });
         });
 
-        //add items to the shop
-        var flatshop = this.shopGrid.flat();
-        for(var i = 0; i < flatshop.length; i++){
-            flatshop[i].item = i;
-            console.log(flatshop[i].item);
-        }
+        
+
+
 
     }
 
@@ -125,7 +136,9 @@ export default class Game
                     y > gridPos.y && y < gridPos.y + this.grid[i][j].size
                 ) 
                 {
-                    console.log(gridElement.item);
+                    if(gridElement.item){
+                        this.selectedItem = gridElement.item;
+                    }
 
                 }               
             }
@@ -161,15 +174,16 @@ export default class Game
                         y > gridPos.y && y < gridPos.y + this.grid[i][j].size
                     ) 
                     {
-                        
-                        console.log(gridElement.position.x + "," + gridElement.position.y);
-                        var testTower = new Tower(this.canvas, this.c, this);
-                        testTower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
-                        testTower.enemies = this.enemies;
-                        this.towers.push(testTower);
-                        gridElement.hasTower = true;
-                        gridElement.colour = Colours.grass;
-                        return;
+                        if(this.selectedItem){
+                            var tower = this.selectedItem.clone();
+                            tower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
+                            tower.enemies = this.enemies;
+                            this.towers.push(tower);
+                            gridElement.hasTower = true;
+                            gridElement.colour = Colours.grass;
+                            return;
+                        }
+
                     }  
                 }
              

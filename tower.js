@@ -15,8 +15,28 @@ export default class Tower{
         this.game = game;
         this.radius = 250;
         this.projeciles = [];
+        this.name = "Tower";
 
         }
+
+    clone() {
+        const clone = new Tower(this.canvas, this.c, this.game);
+
+        clone.position = new Vector(this.position.x, this.position.y);
+        clone.width = this.width;
+        clone.height = this.height;
+        clone.lastfireTime = this.lastfireTime;
+        clone.fireRate = this.fireRate;
+        clone.damage = this.damage;
+        clone.range = this.range;
+        clone.radius = this.radius;
+
+        clone.enemies = [];
+        clone.target = null;
+        clone.projeciles = [];
+
+        return clone;
+    }
 
     draw(){
 
