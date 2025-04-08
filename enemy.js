@@ -11,13 +11,15 @@ export default class Enemy{
         this.velocity = new Vector(1,0);
         this.target = this.waypoints[1];
         this.waypointIndex = 1;
-        this.speed = 1;
+        this.baseSpeed = 1;
+        this.speed = this.baseSpeed;
         this.finalDir = new Vector(1,0);
         this.isDead = false;
         this.drawingArea = drawingArea;
         this.game = game;
         this.health = 3;
         this.bounty = 50;
+        this.isSlowed = false;
         
         
     }
@@ -46,6 +48,14 @@ export default class Enemy{
             this.c.fill();
         }
 
+    }
+
+    slow(){
+        this.speed = this.baseSpeed / 2;
+
+        setTimeout(() => {
+            this.speed = this.baseSpeed;
+        }, 3000);
     }
 
     move(){
@@ -77,6 +87,7 @@ export default class Enemy{
             }
         }
     }
+
 
     update(){
 

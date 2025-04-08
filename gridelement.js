@@ -16,6 +16,7 @@ export default class GridElement{
         this.canvas = canvas;
         this.drawingArea = drawingArea;
         this.isPath = false;
+        this.isIce = false;
         this.debug = false;
         this.hasTower = false;
         

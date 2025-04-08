@@ -1,6 +1,4 @@
 import GridElement from './gridelement.js';
-import Enemy from './enemy.js';
-import Enemy2 from './enemy2.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
 import ShopGridElement from './shopgridelement.js';
@@ -9,6 +7,7 @@ import LaserTower from './lasertower.js';
 import AttackSpeedTower from './attackspeedtower.js';
 import RocketTower from './rockettower.js';
 import WaveSpawner from './wavespawner.js';
+import IceTower from './icetower.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -81,15 +80,13 @@ export default class Game
 
         
         //add items to the shop
-        var defaultTower = new Tower(this.canvas, this.c, this);
-        var laserTower = new LaserTower(this.canvas, this.c, this);
-        var attackSpeedTower = new AttackSpeedTower(this.canvas, this.c, this);
-        var rocketTower = new RocketTower(this.canvas, this.c, this);
-        var shopItems = []
-        shopItems.push(defaultTower);
-        shopItems.push(laserTower);
-        shopItems.push(attackSpeedTower);
-        shopItems.push(rocketTower);
+        var shopItems = [
+            new Tower(this.canvas, this.c, this),
+            new LaserTower(this.canvas, this.c, this),
+            new AttackSpeedTower(this.canvas, this.c, this),
+            new RocketTower(this.canvas, this.c, this),
+            new IceTower(this.canvas, this.c, this),
+        ];
 
         for (let i = 0; i < gridYSize; i++) {
             this.shopGrid[i] = [];
@@ -299,9 +296,14 @@ export default class Game
         this.shopGrid.flat().forEach(element => element.draw());
         this.towers.forEach(element => element.draw());
 
-        this.c.font = "16px Arial";  // Font size and type
+        if(!this.waveSpawner.isSpawning){
+            this.waveSpawner.draw();
+        }
+        
+
+        this.c.font = "30px Arial";  // Font size and type
         this.c.fillStyle = "black";  // Text color
-        this.c.fillText(`$${this.money}`, 50,100, 100); 
+        this.c.fillText(`$${this.money}`, 50,70, 100); 
 
         // c.fillStyle = this.bgColour;
         // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);
@@ -318,7 +320,7 @@ export default class Game
 
         this.towers.forEach(element => {element.update()})
 
-        if(this.waveStarted && this.enemies.length <= 0){
+        if(this.waveStarted && this.enemies.length <= 0 && this.waveSpawner.allEnemiesSpawned){
             this.waveSpawner.pause();
             this.waveStarted = false;
         }

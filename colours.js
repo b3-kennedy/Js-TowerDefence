@@ -5,4 +5,5 @@ export default class Colours
     static selectedColour = 'green';
     static shopColour = "rgb(74,73,70)";
     static selectedShopColour = "rgb(125,123,117)";
+    static iceColour = "rgb(191, 255, 254)";
 }

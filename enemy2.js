@@ -46,6 +46,10 @@ export default class Enemy2 extends Enemy{
         }        
     }
 
+    slow(){
+        super.slow();
+    }
+
     move(){
         super.move();
     }
