@@ -18,6 +18,7 @@ export default class Enemy2 extends Enemy{
         this.game = game;
         this.health = 6;
         this.bounty = 100;
+        this.damageToPlayer = 2;
     }
 
     takeDamage(damage){

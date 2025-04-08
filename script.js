@@ -59,6 +59,7 @@ export default class Game
         this.selectedTower = null;
         this.money = 500;
         this.waveStarted = false;
+        this.health = 100;
         
         this.start();
         
@@ -307,6 +308,14 @@ export default class Game
 
         // c.fillStyle = this.bgColour;
         // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);
+    }
+
+    damagePlayer(damage){
+        this.health -= damage;
+        console.log(`Player Health: ${this.health}`);
+        if(this.health <= 0){
+            console.log("GAME OVER");
+        }
     }
 
     update(){

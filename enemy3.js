@@ -19,43 +19,44 @@ export default class Enemy3 extends Enemy{
             this.game = game;
             this.health = 3;
             this.bounty = 100;
+            this.damageToPlayer = 1;
         }
     
-        takeDamage(damage){
-            this.health -= damage;
-            if(this.health <= 0){
-                this.isDead = true;
-                this.game.alterMoney(this.bounty);
-            }
+    takeDamage(damage){
+        this.health -= damage;
+        if(this.health <= 0){
+            this.isDead = true;
+            this.game.alterMoney(this.bounty);
         }
-    
-        isInDrawingArea(){
-            return (
-                this.position.x >= this.drawingArea.x && 
-                this.position.x < this.drawingArea.x + this.drawingArea.width && 
-                this.position.y >= this.drawingArea.y && 
-                this.position.y < this.drawingArea.y + this.drawingArea.height);
-        }
-    
-        draw(){
-            
-            if(!this.isDead && this.isInDrawingArea()){
-                this.c.beginPath();
-                this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
-                this.c.fillStyle = 'yellow';
-                this.c.fill();
-            }        
-        }
+    }
 
-        slow(){
-            super.slow();
-        }
-    
-        move(){
-            super.move();
-        }
-    
-        update(){
-            super.update();    
-        }
+    isInDrawingArea(){
+        return (
+            this.position.x >= this.drawingArea.x && 
+            this.position.x < this.drawingArea.x + this.drawingArea.width && 
+            this.position.y >= this.drawingArea.y && 
+            this.position.y < this.drawingArea.y + this.drawingArea.height);
+    }
+
+    draw(){
+        
+        if(!this.isDead && this.isInDrawingArea()){
+            this.c.beginPath();
+            this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
+            this.c.fillStyle = 'yellow';
+            this.c.fill();
+        }        
+    }
+
+    slow(){
+        super.slow();
+    }
+
+    move(){
+        super.move();
+    }
+
+    update(){
+        super.update();    
+    }
 }

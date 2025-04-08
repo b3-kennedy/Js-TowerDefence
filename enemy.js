@@ -20,6 +20,7 @@ export default class Enemy{
         this.health = 3;
         this.bounty = 50;
         this.isSlowed = false;
+        this.damageToPlayer = 1;
         
         
     }
@@ -94,7 +95,7 @@ export default class Enemy{
         if(!this.isDead){
             this.move();
             if(this.position.x < 0 && this.waypointIndex > 1){
-                console.log("Offscreen");
+                this.game.damagePlayer(this.damageToPlayer);
                 this.isDead = true;
             }
         }
