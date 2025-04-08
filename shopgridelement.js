@@ -56,11 +56,12 @@ export default class ShopGridElement{
         }
 
         if(this.item){
+
             this.c.fillStyle = 'white';
             this.c.font = '12px Arial';
             this.c.textAlign = 'center';
             const rawText = this.item.name; // or any other string
-            const maxWidth = this.size - 10; // Padding from edges
+            const maxWidth = this.size - 5; // Padding from edges
         
             const [line1, line2] = wrapTextToTwoLines(this.c, rawText, maxWidth);
             

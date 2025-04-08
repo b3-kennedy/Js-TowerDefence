@@ -1,5 +1,6 @@
 import GridElement from './gridelement.js';
 import Enemy from './enemy.js';
+import Enemy2 from './enemy2.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
 import ShopGridElement from './shopgridelement.js';
@@ -7,6 +8,7 @@ import Tower from './tower.js';
 import LaserTower from './lasertower.js';
 import AttackSpeedTower from './attackspeedtower.js';
 import RocketTower from './rockettower.js';
+import WaveSpawner from './wavespawner.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -57,7 +59,10 @@ export default class Game
         this.waypoints = [];
         this.selectedTower = null;
         this.money = 500;
+        this.waveStarted = false;
+        
         this.start();
+        
     }
 
     start(){
@@ -152,19 +157,8 @@ export default class Game
     }
 
     createEnemy(){
-
-        for(var i =0; i < 10; i++){
-            setTimeout(() => {
-                let enemy = new Enemy(this.canvas, this.c, this.waypoints, this.drawingArea, this);
-                enemy.position = new Vector(
-                    this.waypoints[0].getCentrePosition().x - 50,
-                    this.waypoints[0].getCentrePosition().y
-                );
-                enemy.radius = 15;
-                enemy.speed = 1;
-                this.enemies.push(enemy);
-            }, (i + 1) * 1000); // Spawns enemies 1 second apart
-        }
+        this.waveSpawner = new WaveSpawner(this.canvas, this.c, this);
+        this.waveSpawner.startSequence();
 
     }
 
@@ -294,7 +288,6 @@ export default class Game
 
     alterMoney(value){
         this.money += value;
-        console.log(this.money);
     }
 
     draw(){
@@ -324,6 +317,11 @@ export default class Game
         });
 
         this.towers.forEach(element => {element.update()})
+
+        if(this.waveStarted && this.enemies.length <= 0){
+            this.waveSpawner.pause();
+            this.waveStarted = false;
+        }
     
         this.draw();
     }

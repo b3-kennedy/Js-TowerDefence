@@ -43,24 +43,7 @@ export default class RocketTower extends Tower{
     }
 
     getTarget(){
-        let enemies = this.game.enemies;
-        if (enemies.length === 0) {
-            this.target = null;
-            return;
-        }
-
-        let closestEnemy = null;
-        let closestDistance = Infinity;
-
-        for (let enemy of enemies) {
-            let distance = Vector.Distance(this.position, enemy.position);
-            if (distance < this.radius && distance < closestDistance) {
-                closestDistance = distance;
-                closestEnemy = enemy;
-            }
-        }
-
-        this.target = closestEnemy;
+        super.getTarget();
     }
 
     update(){

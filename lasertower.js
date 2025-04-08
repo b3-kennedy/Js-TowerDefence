@@ -38,7 +38,7 @@ export default class LaserTower extends Tower{
         this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
 
         if(this.target){
-            this.drawLine(this.c, new Vector(this.position.x, this.position.y - this.height), this.target.position, 'red', 1);
+            this.drawLine(this.c, new Vector(this.position.x, this.position.y - this.height), this.target.position, 'red', 2);
         }
     }
 
