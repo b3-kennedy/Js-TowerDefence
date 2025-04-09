@@ -11,7 +11,7 @@ export default class Enemy{
         this.velocity = new Vector(1,0);
         this.target = this.waypoints[1];
         this.waypointIndex = 1;
-        this.baseSpeed = 1;
+        this.baseSpeed = 100;
         this.speed = this.baseSpeed;
         this.finalDir = new Vector(1,0);
         this.isDead = false;
@@ -21,6 +21,7 @@ export default class Enemy{
         this.bounty = 50;
         this.isSlowed = false;
         this.damageToPlayer = 1;
+        this.slowTimer = 0;
         
         
     }
@@ -54,24 +55,22 @@ export default class Enemy{
     slow(){
         this.speed = this.baseSpeed / 2;
 
-        setTimeout(() => {
-            this.speed = this.baseSpeed;
-        }, 3000);
+        this.isSlowed = true;
     }
 
-    move(){
+    move(deltaTime){
         if (this.waypoints.length > 0) {
             
             if(this.waypointIndex+1 == this.waypoints.length){
                 this.velocity = Vector.Normalize(this.finalDir);
-                this.velocity = Vector.Multiply(this.velocity, this.speed);
+                this.velocity = Vector.Multiply(this.velocity, this.speed * deltaTime);
 
                 this.position = Vector.Add(this.position, this.velocity);
             }else{
                 const dir = Vector.Direction(this.position, this.target.getCentrePosition());
             
                 this.velocity = Vector.Normalize(dir);
-                this.velocity = Vector.Multiply(this.velocity, this.speed);
+                this.velocity = Vector.Multiply(this.velocity, this.speed * deltaTime);
     
                 this.position = Vector.Add(this.position, this.velocity);
         
@@ -90,13 +89,21 @@ export default class Enemy{
     }
 
 
-    update(){
+    update(deltaTime){
 
         if(!this.isDead){
-            this.move();
+            this.move(deltaTime);
             if(this.position.x < 0 && this.waypointIndex > 1){
                 this.game.damagePlayer(this.damageToPlayer);
                 this.isDead = true;
+            }
+
+            if(this.isSlowed){
+                this.slowTimer += deltaTime;
+                if(this.slowTimer >= 3){
+                    this.isSlowed = false;
+                    this.speed = this.baseSpeed;
+                }
             }
         }
 

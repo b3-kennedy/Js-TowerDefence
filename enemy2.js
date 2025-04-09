@@ -11,7 +11,7 @@ export default class Enemy2 extends Enemy{
         this.velocity = new Vector(1,0);
         this.target = this.waypoints[1];
         this.waypointIndex = 1;
-        this.speed = 1;
+        this.speed = 100;
         this.finalDir = new Vector(1,0);
         this.isDead = false;
         this.drawingArea = drawingArea;
@@ -51,11 +51,11 @@ export default class Enemy2 extends Enemy{
         super.slow();
     }
 
-    move(){
-        super.move();
+    move(deltaTime){
+        super.move(deltaTime);
     }
 
-    update(){
-        super.update();    
+    update(deltaTime){
+        super.update(deltaTime);    
     }
 }

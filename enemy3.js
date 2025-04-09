@@ -11,7 +11,7 @@ export default class Enemy3 extends Enemy{
             this.velocity = new Vector(1,0);
             this.target = this.waypoints[1];
             this.waypointIndex = 1;
-            this.baseSpeed = 2
+            this.baseSpeed = 200;
             this.speed = this.baseSpeed;
             this.finalDir = new Vector(1,0);
             this.isDead = false;
@@ -52,11 +52,11 @@ export default class Enemy3 extends Enemy{
         super.slow();
     }
 
-    move(){
-        super.move();
+    move(deltaTime){
+        super.move(deltaTime);
     }
 
-    update(){
-        super.update();    
+    update(deltaTime){
+        super.update(deltaTime);    
     }
 }

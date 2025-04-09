@@ -60,8 +60,8 @@ export default class Game
         this.money = 500;
         this.waveStarted = false;
         this.health = 100;
-        
-        this.start();
+
+        this.lastTime = performance.now();
         
     }
 
@@ -71,7 +71,8 @@ export default class Game
         this.createPath();
         this.createEnemy();
         this.createShop();
-        this.update();
+        this.update = this.update.bind(this);
+        requestAnimationFrame(this.update);
     }
 
     createShop(){
@@ -156,7 +157,6 @@ export default class Game
 
     createEnemy(){
         this.waveSpawner = new WaveSpawner(this.canvas, this.c, this);
-        this.waveSpawner.startSequence();
 
     }
 
@@ -318,27 +318,31 @@ export default class Game
         }
     }
 
-    update(){
-        requestAnimationFrame(this.update.bind(this));
+    update(currentTime){
+
+        let deltaTime = (currentTime - this.lastTime) / 1000;
+
+        deltaTime = Math.min(deltaTime, 0.1); //limits deltaTime so when tabbed out the enemies dont have irrational movement
+
+        this.lastTime = currentTime;
+        requestAnimationFrame(this.update);
         c.clearRect(0,0, canvas.width, canvas.height);
         this.enemies = this.enemies.filter(element => !element.isDead);
 
+        this.waveSpawner.update(deltaTime);
+
         this.enemies.forEach(element => {
-            element.update();
+            element.update(deltaTime);
         });
 
-        this.towers.forEach(element => {element.update()})
-
-        if(this.waveStarted && this.enemies.length <= 0 && this.waveSpawner.allEnemiesSpawned){
-            this.waveSpawner.pause();
-            this.waveStarted = false;
-        }
+        this.towers.forEach(element => {element.update(deltaTime)})
     
         this.draw();
     }
 }
 
 var game = new Game(1010, 1010, 'lightblue', canvas, c, 17)
+game.start();
 
 
 

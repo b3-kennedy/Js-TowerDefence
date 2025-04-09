@@ -25,6 +25,7 @@ export default class WaveSpawner{
         this.isSpawning = false;
         this.allEnemiesSpawned = false;
         this.enemiesSpawned = 0;
+        this.pauseTimer = 0;
         this.setupWaves();
 
     }
@@ -32,60 +33,26 @@ export default class WaveSpawner{
     setupWaves(){
 
         this.waves = [
-            new Wave(10, 1000, {enemy1: 100}),
-            new Wave(15, 1000, {enemy1: 50, enemy2: 50}),
-            new Wave(20, 1000, {enemy1: 20, enemy2: 20, enemy3: 60}),
-            new Wave(25, 500, {enemy1: 20, enemy2: 20, enemy3: 60}),
+            new Wave(10, 1, {enemy1: 100}),
+            new Wave(15, 1, {enemy1: 50, enemy2: 50}),
+            new Wave(20, 1, {enemy1: 20, enemy2: 20, enemy3: 60}),
+            new Wave(25, 0.5, {enemy1: 20, enemy2: 20, enemy3: 60}),
         ];
-    }
-
-    startSequence(){
-        this.pause();
     }
 
     spawnWave(){
         this.currentWave = this.waves[this.waveNumber] || this.waves[this.waves.length - 1];
-
         this.enemiesSpawned = 0;
         this.allEnemiesSpawned = false;
-
-
+        this.spawnTimer = 0;
+        this.spawnIndex = 0;
+        this.pauseTimer = 0;
+        this.isSpawning = true;
+    
         console.log(
             `Wave: ${this.waveNumber + 1} | Enemy Count: ${this.currentWave.enemyCount} | Spawn Interval: ${this.currentWave.spawnInterval} | Spawn Chances: ${JSON.stringify(this.currentWave.spawnChances)}`
         );
-
-        this.isSpawning = true;
-        
-        for (let i = 0; i < this.currentWave.enemyCount; i++) {
-            setTimeout(() => {
-                let enemyType = this.getEnemy();
-                let enemy = null;
-                switch (enemyType) {
-                    case "enemy1":
-                        enemy = new Enemy(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
-                        break;
-                    case "enemy2":
-                        enemy = new Enemy2(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
-                        break;
-                    case "enemy3":
-                        enemy = new Enemy3(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
-
-                }
-
-                this.enemiesSpawned++;
-                if(this.enemiesSpawned >= this.currentWave.enemyCount){
-                    this.allEnemiesSpawned = true;
-                }
-
-                enemy.position = new Vector(
-                    this.game.waypoints[0].getCentrePosition().x - 50,
-                    this.game.waypoints[0].getCentrePosition().y
-                );
-                this.game.enemies.push(enemy);
-                this.game.waveStarted = true;
-            }, (i + 1) * this.currentWave.spawnInterval);
-        }
-        
+    
         this.waveNumber++;
 
         
@@ -104,23 +71,71 @@ export default class WaveSpawner{
 
     }
 
-    updateWave(){
-        this.enemyCount += 5;
-        this.spawnChances.enemy1 -= 50;
-        this.spawnChances.enemy2 += 50;
+    update(deltaTime){
+        if (!this.isSpawning || this.allEnemiesSpawned){
+            this.pause(deltaTime);
+        }
+        else{
+            this.spawnTimer += deltaTime;
+            if (this.spawnTimer >= this.currentWave.spawnInterval && this.spawnIndex < this.currentWave.enemyCount) {
+                this.spawnTimer = 0;
+        
+                let enemyType = this.getEnemy();
+                console.log(enemyType);
+                let enemy = null;
+        
+                switch (enemyType) {
+                    case "enemy1":
+                        enemy = new Enemy(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
+                        break;
+                    case "enemy2":
+                        enemy = new Enemy2(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
+                        break;
+                    case "enemy3":
+                        enemy = new Enemy3(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
+                        break;
+                }
+        
+                enemy.position = new Vector(
+                    this.game.waypoints[0].getCentrePosition().x - 50,
+                    this.game.waypoints[0].getCentrePosition().y
+                );
+        
+                this.game.enemies.push(enemy);
+                this.game.waveStarted = true;
+        
+                this.spawnIndex++;
+                this.enemiesSpawned++;
+        
+                if (this.enemiesSpawned >= this.currentWave.enemyCount) {
+                    this.allEnemiesSpawned = true;
+                }
+            }            
+        }
+
+
     }
 
-    pause() {
-        this.remainingTime = this.timeBetweenWave / 1000; // Time in seconds
-        this.isSpawning = false;
-        const timerInterval = setInterval(() => {
-            this.remainingTime--;
+    pause(deltaTime) {    
+        this.pauseTimer += deltaTime;
+    
+        //console.log(`PauseTimer: ${this.pauseTimer.toFixed(2)} / ${this.remainingTime}`);
+    
+        if (this.pauseTimer >= this.timeBetweenWave/1000) {
+            this.pauseTimer = 0;
+            this.remainingTime = 0;
+            this.spawnWave();
+        }
+        
+
+        // const timerInterval = setInterval(() => {
+        //     this.remainingTime--;
             
-            if (this.remainingTime <= 0) {
-                clearInterval(timerInterval); // Stop the timer
-                this.spawnWave(); // Trigger the spawnWave
-            }
-        }, 1000); // Update every second (1000 ms)
+        //     if (this.remainingTime <= 0) {
+        //         clearInterval(timerInterval); // Stop the timer
+        //         this.spawnWave(); // Trigger the spawnWave
+        //     }
+        // }, 1000); // Update every second (1000 ms)
     }
 
     draw(){
