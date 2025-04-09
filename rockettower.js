@@ -46,7 +46,7 @@ export default class RocketTower extends Tower{
         super.getTarget();
     }
 
-    update(){
+    update(deltaTime){
 
         
         const currentTime = Date.now();
@@ -70,7 +70,7 @@ export default class RocketTower extends Tower{
         }
 
         this.projeciles.forEach(element => {
-            element.update();
+            element.update(deltaTime);
         });
     }
 }

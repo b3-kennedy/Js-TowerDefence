@@ -1,28 +1,19 @@
 import Vector from "./vector.js";
-import Projectile from "./projectile.js";
+import Tower from "./tower.js";
+import PierceProjectile from "./pierceprojectile.js";
 
-export default class Tower{
+
+export default class PierceTower extends Tower{
     constructor(canvas, context, game){
-        this.canvas = canvas;
-        this.position = new Vector(0,0);
-        this.c = context;
-        this.width = 25;
-        this.height = 40;
-        this.lastfireTime = 0;
-        this.baseFireRate = 1000;
-        this.fireRate = this.baseFireRate;
-        this.enemies = [];
-        this.target = null;
-        this.game = game;
-        this.radius = 250;
-        this.projeciles = [];
-        this.name = "Tower";
-        this.cost = 100;
-
-        }
-
+        super(canvas, context, game);
+        this.baseFireRate = 3000;
+        this.name = "Pierce Tower";
+        this.damage = 1;
+        this.cost = 250;
+        this.height = 50;
+    }
     clone() {
-        const clone = new Tower(this.canvas, this.c, this.game);
+        const clone = new PierceTower(this.canvas, this.c, this.game);
 
         clone.position = new Vector(this.position.x, this.position.y);
         clone.width = this.width;
@@ -42,7 +33,7 @@ export default class Tower{
 
     draw(){
 
-        this.c.fillStyle = 'red';
+        this.c.fillStyle = 'pink';
         this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
         this.c.strokeStyle = 'black';
         this.c.borderWidth = 1;
@@ -86,8 +77,10 @@ export default class Tower{
                     this.target = null;
                 }
 
-                var projectile = new Projectile(this.canvas, this.c);
+                var projectile = new PierceProjectile(this.canvas, this.c, this.game);
+                
                 projectile.position = new Vector(this.position.x, this.position.y - this.height);
+                projectile.direction = Vector.Direction(projectile.position, this.target.position);
                 this.projeciles.push(projectile);
                 projectile.target = this.target;
                 this.lastfireTime = currentTime;

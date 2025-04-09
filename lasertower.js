@@ -55,7 +55,7 @@ export default class LaserTower extends Tower{
         ctx.stroke();
     }
 
-    update(){
+    update(deltaTime){
         const currentTime = Date.now();
         if(currentTime - this.lastfireTime >= this.fireRate){
 

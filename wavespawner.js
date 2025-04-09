@@ -23,7 +23,7 @@ export default class WaveSpawner{
         this.currentWave = this.waves[0];
         this.remainingTime = 0;
         this.isSpawning = false;
-        this.allEnemiesSpawned = false;
+        this.allEnemiesSpawned = true;
         this.enemiesSpawned = 0;
         this.pauseTimer = 0;
         this.setupWaves();
@@ -72,18 +72,19 @@ export default class WaveSpawner{
     }
 
     update(deltaTime){
-        if (!this.isSpawning || this.allEnemiesSpawned){
+        // Only pause and prepare for next wave when all enemies spawned AND no enemies on screen
+        if (this.allEnemiesSpawned && this.game.enemies.length === 0) {
             this.pause(deltaTime);
         }
-        else{
+        // Continue spawning enemies for current wave
+        else if (this.isSpawning && !this.allEnemiesSpawned) {
             this.spawnTimer += deltaTime;
             if (this.spawnTimer >= this.currentWave.spawnInterval && this.spawnIndex < this.currentWave.enemyCount) {
                 this.spawnTimer = 0;
-        
+    
                 let enemyType = this.getEnemy();
-                console.log(enemyType);
                 let enemy = null;
-        
+    
                 switch (enemyType) {
                     case "enemy1":
                         enemy = new Enemy(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
@@ -95,18 +96,18 @@ export default class WaveSpawner{
                         enemy = new Enemy3(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
                         break;
                 }
-        
+    
                 enemy.position = new Vector(
                     this.game.waypoints[0].getCentrePosition().x - 50,
                     this.game.waypoints[0].getCentrePosition().y
                 );
-        
+    
                 this.game.enemies.push(enemy);
                 this.game.waveStarted = true;
-        
+    
                 this.spawnIndex++;
                 this.enemiesSpawned++;
-        
+    
                 if (this.enemiesSpawned >= this.currentWave.enemyCount) {
                     this.allEnemiesSpawned = true;
                 }
@@ -147,8 +148,9 @@ export default class WaveSpawner{
         this.c.textAlign = "center";
         this.c.textBaseline = "middle";
         
+        var maxTime = this.timeBetweenWave/1000;
         // Display the timer text on the canvas
-        this.c.fillText(`Next Wave in: ${this.remainingTime}`, this.canvas.width / 2, 70);
+        this.c.fillText(`Next Wave in: ${Math.round(maxTime - this.pauseTimer)}`, this.canvas.width / 2, 70);
     }
 
     

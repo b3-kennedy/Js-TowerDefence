@@ -73,7 +73,7 @@ export default class AttackSpeedTower extends Tower{
         //     ctx.stroke();
         // }
     
-        update(){
+        update(deltaTime){
             
         }
 }

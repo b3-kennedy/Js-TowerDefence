@@ -54,7 +54,7 @@ export default class IceTower extends Tower{
             return closeEnemies;
         }
     
-        update(){
+        update(deltaTime){
     
             
             const currentTime = Date.now();
@@ -64,9 +64,5 @@ export default class IceTower extends Tower{
                     enemies.forEach(element => element.slow());
                 }
             }
-    
-            this.projeciles.forEach(element => {
-                element.update();
-            });
         }
 }

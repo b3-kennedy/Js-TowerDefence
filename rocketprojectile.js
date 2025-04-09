@@ -10,7 +10,7 @@ export default class RocketProjectile extends Projectile{
         this.position = new Vector(0,0);
         this.velocity = new Vector(0,0);
 
-        this.speed = 5;
+        this.speed = 500;
         this.target = null;
         this.damage = 1;
         this.isActive = true;
@@ -41,14 +41,14 @@ export default class RocketProjectile extends Projectile{
     }
 
 
-    update(){
+    update(deltaTime){
         if(!this.target) return;
 
         if(this.isActive){
             var dir = Vector.Direction(this.position, this.target.position);
             dir = Vector.Normalize(dir);
     
-            this.velocity = Vector.Multiply(dir,this.speed);
+            this.velocity = Vector.Multiply(dir,this.speed * deltaTime);
     
             this.position = Vector.Add(this.position, this.velocity);
     
