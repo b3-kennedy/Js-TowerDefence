@@ -10,6 +10,7 @@ import WaveSpawner from './wavespawner.js';
 import IceTower from './icetower.js';
 import PierceTower from './piercetower.js';
 import InfoPanel from './infopanel.js';
+import SniperTower from './snipertower.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -101,6 +102,7 @@ export default class Game
             new RocketTower(this.canvas, this.c, this),
             new IceTower(this.canvas, this.c, this),
             new PierceTower(this.canvas, this.c, this),
+            new SniperTower(this.canvas, this.c, this),
         ];
 
         for (let i = 0; i < gridYSize; i++) {

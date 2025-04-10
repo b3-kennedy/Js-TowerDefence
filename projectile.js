@@ -1,19 +1,21 @@
 import Vector from "./vector.js";
 
 export default class Projectile{
-    constructor(canvas, context){
+    constructor(canvas, context, damage, speed){
         this.canvas = canvas;
         this.c = context;
 
         this.position = new Vector(0,0);
         this.velocity = new Vector(0,0);
 
-        this.speed = 500;
+        this.speed = speed;
         this.target = null;
-        this.damage = 1;
+        this.damage = damage;
         this.isActive = true;
 
         this.radius = 3;
+
+        console.log(this.damage);
 
     }
 
