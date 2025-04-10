@@ -16,13 +16,13 @@ export default class RocketProjectile extends Projectile{
         this.isActive = true;
 
         this.game = game;
-        this.radius = 50;
+        this.radius = 5;
     }
 
     draw(){
         if(this.isActive && this.target && !this.target.isDead){
             this.c.beginPath();
-            this.c.arc(this.position.x,this.position.y, 5, 0, 360, false);
+            this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
             this.c.fillStyle = 'blue';
             this.c.fill();
         }
@@ -52,7 +52,7 @@ export default class RocketProjectile extends Projectile{
     
             this.position = Vector.Add(this.position, this.velocity);
     
-            if(Vector.Distance(this.position, this.target.position) <= 10){
+            if(Vector.Distance(this.position, this.target.position) <= this.target.radius + this.radius/2){
                 this.doAoeDamage();
                 this.isActive = false;
             }

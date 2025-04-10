@@ -18,7 +18,7 @@ export default class PierceProjectile extends Projectile{
         this.isActive = true;
 
         this.game = game;
-        this.radius = 50;
+        this.radius = 3;
 
         this.hitCount = 0;
         this.maxHitCount = maxHitCount;
@@ -30,7 +30,7 @@ export default class PierceProjectile extends Projectile{
     draw(){
         if(this.isActive){
             this.c.beginPath();
-            this.c.arc(this.position.x,this.position.y, 3, 0, 360, false);
+            this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
             this.c.fillStyle = 'red';
             this.c.fill();
         }
@@ -54,7 +54,7 @@ export default class PierceProjectile extends Projectile{
             this.position = Vector.Add(this.position, this.velocity);
             
             for(var i = 0; i < enemies.length; i++){
-                if(!this.damagedEnemies.has(enemies[i]) && Vector.Distance(this.position, enemies[i].position) <= 10){
+                if(!this.damagedEnemies.has(enemies[i]) && Vector.Distance(this.position, enemies[i].position) <= enemies[i].radius + this.radius/2){
                     enemies[i].takeDamage(this.damage);
                     this.hitCount++;
                     if(!enemies[i].isDead){
