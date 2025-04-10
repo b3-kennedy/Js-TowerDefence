@@ -14,10 +14,13 @@ export default class Tower{
         this.enemies = [];
         this.target = null;
         this.game = game;
-        this.radius = 250;
+        this.radius = 150;
         this.projeciles = [];
         this.name = "Tower";
         this.cost = 100;
+        var seconds = this.fireRate / 1000;
+        this.description = `Fires a projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
+        this.isPlaced = false;
 
         }
 
@@ -42,15 +45,39 @@ export default class Tower{
 
     draw(){
 
-        this.c.fillStyle = 'red';
-        this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-        this.c.strokeStyle = 'black';
-        this.c.borderWidth = 1;
-        this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
-        this.projeciles.forEach(element => {
-            element.draw();
-        });
+        const halfWidth = this.width / 2;
+        const topLeftX = this.position.x - halfWidth;
+        const topLeftY = this.position.y;
 
+        let fillStyle, strokeStyle;
+
+        if (this.isPlaced) {
+            this.projeciles.forEach(element => element.draw());
+            fillStyle = 'red';
+            strokeStyle = 'black';
+        } else {
+            this.drawRadius();
+            fillStyle = 'rgba(255, 0, 0, 0.5)';   // red with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+            
+        }
+
+        
+        this.c.fillStyle = fillStyle;
+        this.c.strokeStyle = strokeStyle;
+
+        
+        this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+        this.c.strokeStyle = 'black'; 
+        this.c.borderWidth = 2;
+        this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
+    }
+
+    drawRadius(){
+        this.c.beginPath();
+        this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
+        this.c.fillStyle = 'rgba(0,0,0,0.25)';
+        this.c.fill();
     }
 
     getTarget(){

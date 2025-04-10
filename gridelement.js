@@ -10,7 +10,7 @@ export default class GridElement{
         this.selectedColour = 'blue';
         this.borderColour = 'black';
         this.borderWidth = 1;
-        this.outsideBorderWidth = 3; 
+        this.outsideBorderWidth = 1; 
         this.name = "GridElement: " + "(" + this.position.x + "," + this.position.y + ")";
         this.c = context;
         this.canvas = canvas;

@@ -9,6 +9,8 @@ export default class RocketTower extends Tower{
         this.name = "Rocket Tower";
         this.damage = 1;
         this.cost = 250;
+        var seconds = this.baseFireRate /1000;
+        this.description = `Fires a rocket every ${seconds} ${seconds === 1 ? 'second' : 'seconds'} which explodes dealing damage in an area, this tower will target the closest enemy`;
     }
 
     clone() {
@@ -29,16 +31,36 @@ export default class RocketTower extends Tower{
         return clone;
     }
 
+    drawRadius(){
+        super.drawRadius();
+    }
+
     draw(){
 
-        this.c.fillStyle = 'yellow';
-        this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-        this.c.strokeStyle = 'black';
-        this.c.borderWidth = 1;
-        this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
-        this.projeciles.forEach(element => {
-            element.draw();
-        });
+        const halfWidth = this.width / 2;
+        const topLeftX = this.position.x - halfWidth;
+        const topLeftY = this.position.y;
+    
+        let fillStyle, strokeStyle;
+
+        if (this.isPlaced) {
+            fillStyle = 'yellow';
+            strokeStyle = 'black';
+            this.projeciles.forEach(element => element.draw());
+        } else {
+            this.drawRadius();
+            fillStyle = 'rgba(255, 255, 0, 0.5)';   // yellow with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+        }
+    
+        this.c.fillStyle = fillStyle;
+        this.c.strokeStyle = strokeStyle;
+    
+        this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+        this.c.strokeStyle = strokeStyle;
+        this.c.borderWidth = 2;
+        this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
+        
 
     }
 

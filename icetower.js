@@ -1,5 +1,6 @@
 import Tower from "./tower.js";
 import Vector from "./vector.js";
+import Colours from "./colours.js";
 
 export default class IceTower extends Tower{
         constructor(canvas, context, game){
@@ -8,6 +9,7 @@ export default class IceTower extends Tower{
             this.name = "Ice Tower";
             this.damage = 0;
             this.cost = 250;
+            this.description = `Slows all enemies within ${this.radius} units`;
         }
     
         clone() {
@@ -30,15 +32,35 @@ export default class IceTower extends Tower{
     
         draw(){
     
-            this.c.fillStyle = 'lightblue';
-            this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-            this.c.strokeStyle = 'black';
-            this.c.borderWidth = 1;
-            this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
-            this.projeciles.forEach(element => {
-                element.draw();
-            });
+            const halfWidth = this.width / 2;
+            const topLeftX = this.position.x - halfWidth;
+            const topLeftY = this.position.y;
+        
+            let fillStyle, strokeStyle;
+
+            if (this.isPlaced) {
+                fillStyle = Colours.iceColour;
+                strokeStyle = 'black';
+            } else {
+                this.drawRadius();
+                fillStyle = 'rgba(191, 255, 254,0.5)';   // red with 50% opacity
+                strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+
+            }
+        
+            this.c.fillStyle = fillStyle;
+            this.c.strokeStyle = strokeStyle;
+        
+            this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+            this.c.strokeStyle = strokeStyle;
+            this.c.borderWidth = 2;
+            this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
     
+    
+        }
+
+        drawRadius(){
+            super.drawRadius();
         }
     
         getTarget(){

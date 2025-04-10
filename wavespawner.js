@@ -119,6 +119,8 @@ export default class WaveSpawner{
 
     pause(deltaTime) {    
         this.pauseTimer += deltaTime;
+
+        this.draw();
     
         //console.log(`PauseTimer: ${this.pauseTimer.toFixed(2)} / ${this.remainingTime}`);
     
@@ -150,7 +152,7 @@ export default class WaveSpawner{
         
         var maxTime = this.timeBetweenWave/1000;
         // Display the timer text on the canvas
-        this.c.fillText(`Next Wave in: ${Math.round(maxTime - this.pauseTimer)}`, this.canvas.width / 2, 70);
+        this.c.fillText(`Next Wave in: ${Math.round(maxTime - this.pauseTimer)}`, this.canvas.width / 2, 140);
     }
 
     

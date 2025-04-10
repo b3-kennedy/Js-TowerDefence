@@ -7,6 +7,7 @@ export default class AttackSpeedTower extends Tower{
         this.cost = 200;
         this.isAura = true;
         this.name = "Fire Rate Buff Tower";
+        this.description = `Increases the fire rate for all towers within ${this.radius} units`
         this.applyBuff();
         
     }
@@ -32,11 +33,33 @@ export default class AttackSpeedTower extends Tower{
         }
     
         draw(){
-            this.c.fillStyle = 'green';
-            this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-            this.c.strokeStyle = 'black';
-            this.c.borderWidth = 1;
-            this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
+            const halfWidth = this.width / 2;
+            const topLeftX = this.position.x - halfWidth;
+            const topLeftY = this.position.y;
+
+            let fillStyle, strokeStyle;
+        
+            if (this.isPlaced) {
+                fillStyle = 'green';
+                strokeStyle = 'black';
+            } else {
+                this.drawRadius();
+                fillStyle = 'rgba(0, 255, 0, 0.5)';   // red with 50% opacity
+                strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+            }
+        
+            this.c.fillStyle = fillStyle;
+            this.c.strokeStyle = strokeStyle;
+        
+            this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+            this.c.strokeStyle = strokeStyle;
+            this.c.borderWidth = 2;
+            this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
+        
+        }
+
+        drawRadius(){
+            super.drawRadius();
         }
     
         getTargets(){

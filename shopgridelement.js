@@ -11,6 +11,7 @@ export default class ShopGridElement{
         this.item = null;
         this.isSelected = false;
         this.game = game;
+        this.isHovered = false;
     }
 
 
@@ -90,8 +91,12 @@ export default class ShopGridElement{
         ) 
         {
             this.colour = Colours.selectedShopColour;
+            if(!this.item) return;
+            var info = {name: this.item.name, cost: this.item.cost, description: this.item.description};
+            this.game.updateInfoPanel(info, true);
         }else{
             this.colour = Colours.shopColour;
+            
         }
     }
 
@@ -100,5 +105,11 @@ export default class ShopGridElement{
         console.log(`${this.name} - mouse over`);
         this.colour = Colours.selectedShopColour;
         this.draw();
+    }
+
+    update(deltaTime){
+        if(this.isHovered){
+            //console.log("hovered");
+        }
     }
 }

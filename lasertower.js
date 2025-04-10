@@ -8,6 +8,8 @@ export default class LaserTower extends Tower{
         this.name = "Laser Tower";
         this.damage = 0.1;
         this.cost = 500;
+        var seconds = this.baseFireRate/1000;
+        this.description = `Fires a laser which deals damage every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
     }
 
     clone()
@@ -31,15 +33,37 @@ export default class LaserTower extends Tower{
     }
 
     draw(){
-        this.c.fillStyle = 'blue';
-        this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-        this.c.strokeStyle = 'black';
-        this.c.borderWidth = 1;
-        this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
+        const halfWidth = this.width / 2;
+        const topLeftX = this.position.x - halfWidth;
+        const topLeftY = this.position.y;
+    
 
-        if(this.target){
-            this.drawLine(this.c, new Vector(this.position.x, this.position.y - this.height), this.target.position, 'red', 2);
+        let fillStyle, strokeStyle;
+
+        if (this.isPlaced) {
+            fillStyle = 'blue';
+            strokeStyle = 'black';
+        } else {
+            this.drawRadius();
+            fillStyle = 'rgba(0, 0, 255, 0.5)';   // red with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
         }
+    
+        this.c.fillStyle = fillStyle;
+        this.c.strokeStyle = strokeStyle;
+    
+        this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+        this.c.strokeStyle = strokeStyle;
+        this.c.borderWidth = 2;
+        this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
+    
+        if(this.target && this.isPlaced){
+            this.drawLine(this.c, new Vector(this.position.x, this.position.y - this.height), this.target.position, 'red', 1);
+        }
+    }
+
+    drawRadius(){
+        super.drawRadius();
     }
 
     getTarget(){

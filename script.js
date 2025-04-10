@@ -9,6 +9,7 @@ import RocketTower from './rockettower.js';
 import WaveSpawner from './wavespawner.js';
 import IceTower from './icetower.js';
 import PierceTower from './piercetower.js';
+import InfoPanel from './infopanel.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -24,45 +25,55 @@ export default class Game
         canvas.height = height;
 
 
-        this.shopArea = {
-            x: 4,
-            y: canvas.height-905,
-            width: 100,
-            height: 800
-        };
 
 
-
-        this.drawingArea = {
-            x: (canvas.width - 800) / 2,  // Centering
-            y: (canvas.height - 800) / 2,
-            width: 800,
-            height: 800
-        };
-
-        c.fillStyle = bgColour;
-        c.fillRect(this.drawingArea.x,this.drawingArea.y,this.drawingArea.width,this.drawingArea.height);
-
-
-
-        this.width = this.drawingArea.width;
-        this.height = this.drawingArea.height;
         this.bgColour = bgColour;
         this.canvas = canvas;
         this.c = context;
         this.grid = [];
         this.shopGrid = [];
         this.gridSize = gridSize;
-        this.squareSize = this.drawingArea.width/this.gridSize;
         this.enemies = [];
         this.towers = [];
+        this.placer;
         this.waypoints = [];
         this.selectedTower = null;
         this.money = 500;
         this.waveStarted = false;
         this.health = 100;
-
+        this.mousePosition = new Vector(0,0);
+        this.gridMousePosition = new Vector(0,0);
+        
         this.lastTime = performance.now();
+        this.mouseOnGame = false;
+
+        this.shopArea = {
+            x: 55,
+            y: canvas.height-855,
+            width: 100,
+            height: 700
+        };
+
+
+        this.drawingArea = {
+            x: (canvas.width - 700) / 2,  // Centering
+            y: (canvas.height - 700) / 2,
+            width: 700,
+            height: 700
+        };
+
+        this.infoPanelDimensions = {
+            x: (canvas.width - 700) / 2 - this.shopArea.width,
+            y: this.canvas.height - 154,
+            width: this.drawingArea.width + this.shopArea.width+1,
+            height: 100            
+        };
+
+        this.infoPanel = new InfoPanel(this.canvas, this.c, this, this.infoPanelDimensions);
+
+        this.width = this.drawingArea.width;
+        this.height = this.drawingArea.height;
+        this.squareSize = this.drawingArea.width/this.gridSize;
         
     }
 
@@ -149,6 +160,9 @@ export default class Game
                 {
                     if(gridElement.item){
                         this.selectedItem = gridElement.item;
+                        var graphic = this.selectedItem.clone();
+                        this.placer = graphic;
+                        graphic.isPlaced = false;
                         gridElement.isSelected = true;
                     }
 
@@ -176,9 +190,11 @@ export default class Game
                     {
                         if(this.selectedItem && this.money >= this.selectedItem.cost){
                             var tower = this.selectedItem.clone();
+                            tower.isPlaced = true;
                             tower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
                             tower.enemies = this.enemies;
                             this.towers.push(tower);
+                            this.placer = null;
                             this.updateAuraTowers();
                             gridElement.hasTower = true;
                             gridElement.colour = Colours.grass;
@@ -207,6 +223,36 @@ export default class Game
         }
     }
 
+    updateInfoPanel(info, isShop){
+        if(isShop){
+            this.infoPanel.nameText = info.name;
+            this.infoPanel.cost = info.cost;
+            this.infoPanel.descriptionText = info.description;
+        }
+
+    }
+
+    setMousePosition(event){
+        const rect = this.canvas.getBoundingClientRect();
+        this.mousePosition.x = event.clientX - rect.left;
+        this.mousePosition.y = event.clientY - rect.top;
+
+        if(this.mousePosition.x >= this.drawingArea.x && this.mousePosition.x < this.drawingArea.x + this.drawingArea.width && 
+            this.mousePosition.y >= this.drawingArea.y && this.mousePosition.y < this.drawingArea.y + this.drawingArea.height){
+                const gridX = Math.floor((this.mousePosition.x - this.drawingArea.x) / this.squareSize);
+                const gridY = Math.floor((this.mousePosition.y - this.drawingArea.y) / this.squareSize);
+
+                this.gridMousePosition.x = gridX;
+                this.gridMousePosition.y = gridY;
+                this.mouseOnGame = true;
+
+        }else{
+            this.gridMousePosition.x = -1;
+            this.gridMousePosition.y = -1;
+            this.mouseOnGame = false;
+        }
+    }
+
     createGrid(){
         for (var i = 0; i < this.gridSize; i++) {
             this.grid[i] = [];
@@ -232,6 +278,7 @@ export default class Game
         });
 
         canvas.addEventListener('mousemove', (event) => {
+            this.setMousePosition(event);
             this.grid.flat().forEach(element => {
                 if (!element.isPath && !element.hasTower) {
                     element.onMouseMove(event);
@@ -299,6 +346,15 @@ export default class Game
         this.shopGrid.flat().forEach(element => element.draw());
         this.towers.forEach(element => element.draw());
 
+
+        var gridX = this.gridMousePosition.x;
+        var gridY = this.gridMousePosition.y;
+        //only draw the placer if the mouse is on the game and not on a path square
+        if(this.mouseOnGame && gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath && this.placer){
+            this.placer.draw()
+        }
+        
+
         if(!this.waveSpawner.isSpawning){
             this.waveSpawner.draw();
         }
@@ -306,10 +362,20 @@ export default class Game
 
         this.c.font = "30px Arial";  // Font size and type
         this.c.fillStyle = "black";  // Text color
-        this.c.fillText(`$${this.money}`, 50,70, 100); 
+        this.c.fillText(`$${this.money}`, 100,140, 100); 
 
         // c.fillStyle = this.bgColour;
         // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);
+        
+        //info panel
+        c.fillStyle = this.bgColour;
+        c.fillRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height);
+
+        this.c.strokeStyle = 'black';
+        this.c.borderWidth = 2;
+        this.c.strokeRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height)
+
+        this.infoPanel.draw();
     }
 
     damagePlayer(damage){
@@ -333,11 +399,22 @@ export default class Game
 
         this.waveSpawner.update(deltaTime);
 
+        if(this.placer){
+            var gridX = this.gridMousePosition.x;
+            var gridY = this.gridMousePosition.y;
+            if(gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath){
+                this.placer.position = this.grid[gridX][gridY].getCentrePosition();
+            }
+            
+        }
+
         this.enemies.forEach(element => {
             element.update(deltaTime);
         });
 
-        this.towers.forEach(element => {element.update(deltaTime)})
+        this.towers.forEach(element => {element.update(deltaTime)});
+
+        this.shopGrid.flat().forEach(element => {element.update(deltaTime)});
     
         this.draw();
     }

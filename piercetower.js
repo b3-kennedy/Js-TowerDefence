@@ -11,6 +11,9 @@ export default class PierceTower extends Tower{
         this.damage = 1;
         this.cost = 250;
         this.height = 50;
+        this.maxPierce = 3;
+        var seconds = this.baseFireRate / 1000;
+        this.description = `Fires a piercing projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}. This projectile will pierce through ${this.maxPierce} enemies before being destroyed, this tower will target the furthest away enemy`;
     }
     clone() {
         const clone = new PierceTower(this.canvas, this.c, this.game);
@@ -33,15 +36,36 @@ export default class PierceTower extends Tower{
 
     draw(){
 
-        this.c.fillStyle = 'pink';
-        this.c.fillRect(this.position.x-this.width/2, this.position.y, this.width, -this.height);
-        this.c.strokeStyle = 'black';
-        this.c.borderWidth = 1;
-        this.c.strokeRect(this.position.x-this.width/2, this.position.y, this.width, -this.height)
-        this.projeciles.forEach(element => {
-            element.draw();
-        });
+        const halfWidth = this.width / 2;
+        const topLeftX = this.position.x - halfWidth;
+        const topLeftY = this.position.y;
+    
 
+        let fillStyle, strokeStyle;
+
+        if (this.isPlaced) {
+            this.projeciles.forEach(element => element.draw());
+            fillStyle = 'pink';
+            strokeStyle = 'black';
+        } else {
+            this.drawRadius();
+            fillStyle = 'rgba(255, 105, 180, 0.5)';   // pink with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+        }
+    
+        this.c.fillStyle = fillStyle;
+        this.c.strokeStyle = strokeStyle;
+    
+        this.c.fillRect(topLeftX, topLeftY, this.width, -this.height);
+        this.c.strokeStyle = strokeStyle;
+        this.c.borderWidth = 2;
+        this.c.strokeRect(topLeftX, topLeftY, this.width, -this.height);
+        
+
+    }
+
+    drawRadius(){
+        super.drawRadius();
     }
 
     getTarget(){
@@ -50,19 +74,19 @@ export default class PierceTower extends Tower{
             this.target = null;
             return;
         }
-
-        let closestEnemy = null;
-        let closestDistance = Infinity;
-
+        
+        let furthestEnemy = null;
+        let furthestDistance = 0;
+        
         for (let enemy of enemies) {
             let distance = Vector.Distance(this.position, enemy.position);
-            if (distance < this.radius && distance < closestDistance) {
-                closestDistance = distance;
-                closestEnemy = enemy;
+            if (distance <= this.radius && distance > furthestDistance) {
+                furthestDistance = distance;
+                furthestEnemy = enemy;
             }
         }
-
-        this.target = closestEnemy;
+        
+        this.target = furthestEnemy;
     }
 
     update(deltaTime){
@@ -77,7 +101,7 @@ export default class PierceTower extends Tower{
                     this.target = null;
                 }
 
-                var projectile = new PierceProjectile(this.canvas, this.c, this.game);
+                var projectile = new PierceProjectile(this.canvas, this.c, this.game, this.maxPierce);
                 
                 projectile.position = new Vector(this.position.x, this.position.y - this.height);
                 projectile.direction = Vector.Direction(projectile.position, this.target.position);

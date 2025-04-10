@@ -2,7 +2,7 @@ import Projectile from "./projectile.js";
 import Vector from "./vector.js";
 
 export default class PierceProjectile extends Projectile{
-    constructor(canvas, context, game){
+    constructor(canvas, context, game, maxHitCount){
         super(canvas, context);
         this.canvas = canvas;
         this.c = context;
@@ -21,10 +21,9 @@ export default class PierceProjectile extends Projectile{
         this.radius = 50;
 
         this.hitCount = 0;
-
+        this.maxHitCount = maxHitCount;
         this.damagedEnemies = new Set();
 
-        console.log("pierce");
 
     }
 
@@ -41,6 +40,9 @@ export default class PierceProjectile extends Projectile{
     update(deltaTime){
         if(!this.target) return;
 
+        if(this.hitCount >= this.maxHitCount){
+            this.isActive = false;
+        }
 
         var enemies = this.game.enemies;
 
@@ -54,7 +56,11 @@ export default class PierceProjectile extends Projectile{
             for(var i = 0; i < enemies.length; i++){
                 if(!this.damagedEnemies.has(enemies[i]) && Vector.Distance(this.position, enemies[i].position) <= 10){
                     enemies[i].takeDamage(this.damage);
-                    this.damagedEnemies.add(enemies[i]);
+                    this.hitCount++;
+                    if(!enemies[i].isDead){
+                        this.damagedEnemies.add(enemies[i]);
+                    }
+                    
                 }
             }
 
