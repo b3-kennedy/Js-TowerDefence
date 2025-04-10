@@ -1,5 +1,5 @@
-import Vector from "./vector.js";
-import RocketProjectile from "./rocketprojectile.js";
+import Vector from "../vector.js";
+import RocketProjectile from "../rocketprojectile.js";
 import Tower from "./tower.js";
 
 export default class RocketTower extends Tower{

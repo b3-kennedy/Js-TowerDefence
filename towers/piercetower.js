@@ -1,23 +1,22 @@
-import Projectile from "./projectile.js";
-import Vector from "./vector.js";
-import Tower from "./towers/tower.js";
+import Vector from "../vector.js";
+import Tower from "./tower.js";
+import PierceProjectile from "../pierceprojectile.js";
 
-export default class SniperTower extends Tower{
+
+export default class PierceTower extends Tower{
     constructor(canvas, context, game){
         super(canvas, context, game);
-        this.name = "Sniper Tower";
-        this.baseFireRate = 5000;
-        this.fireRate = this.baseFireRate;
-        this.damage = 5;
+        this.baseFireRate = 3000;
+        this.name = "Pierce Tower";
+        this.damage = 1;
         this.cost = 250;
-        var seconds = this.baseFireRate /1000;
-        this.description = `Fires a projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
-        this.radius = 500;
-        this.projectileSpeed = 1000;
+        this.height = 50;
+        this.maxPierce = 3;
+        var seconds = this.baseFireRate / 1000;
+        this.description = `Fires a piercing projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}. This projectile will pierce through ${this.maxPierce} enemies before being destroyed, this tower will target the furthest away enemy`;
     }
-
     clone() {
-        const clone = new SniperTower(this.canvas, this.c, this.game);
+        const clone = new PierceTower(this.canvas, this.c, this.game);
 
         clone.position = new Vector(this.position.x, this.position.y);
         clone.width = this.width;
@@ -27,15 +26,12 @@ export default class SniperTower extends Tower{
         clone.damage = this.damage;
         clone.range = this.range;
         clone.radius = this.radius;
+
         clone.enemies = [];
         clone.target = null;
         clone.projeciles = [];
 
         return clone;
-    }
-
-    drawRadius(){
-        super.drawRadius();
     }
 
     draw(){
@@ -44,16 +40,17 @@ export default class SniperTower extends Tower{
         const topLeftX = this.position.x - halfWidth;
         const topLeftY = this.position.y;
     
+
         let fillStyle, strokeStyle;
 
         if (this.isPlaced) {
-            fillStyle = 'brown';  // Change to brown
-            strokeStyle = 'black';
             this.projeciles.forEach(element => element.draw());
+            fillStyle = 'pink';
+            strokeStyle = 'black';
         } else {
             this.drawRadius();
-            fillStyle = 'rgba(139, 69, 19, 0.5)';  // brown with 50% opacity
-            strokeStyle = 'rgba(0, 0, 0, 0.5)';    // black with 50% opacity
+            fillStyle = 'rgba(255, 105, 180, 0.5)';   // pink with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
         }
     
         this.c.fillStyle = fillStyle;
@@ -67,13 +64,33 @@ export default class SniperTower extends Tower{
 
     }
 
+    drawRadius(){
+        super.drawRadius();
+    }
+
     getTarget(){
-        super.getTarget();
+        let enemies = this.game.enemies;
+        if (enemies.length === 0) {
+            this.target = null;
+            return;
+        }
+        
+        let furthestEnemy = null;
+        let furthestDistance = 0;
+        
+        for (let enemy of enemies) {
+            let distance = Vector.Distance(this.position, enemy.position);
+            if (distance <= this.radius && distance > furthestDistance) {
+                furthestDistance = distance;
+                furthestEnemy = enemy;
+            }
+        }
+        
+        this.target = furthestEnemy;
     }
 
     update(deltaTime){
 
-        
         const currentTime = Date.now();
         if(currentTime - this.lastfireTime >= this.fireRate){
 
@@ -84,9 +101,10 @@ export default class SniperTower extends Tower{
                     this.target = null;
                 }
 
-                var projectile = new Projectile(this.canvas, this.c,this.damage, this.projectileSpeed);
-                projectile.enemies = this.enemies;
+                var projectile = new PierceProjectile(this.canvas, this.c, this.game, this.maxPierce);
+                
                 projectile.position = new Vector(this.position.x, this.position.y - this.height);
+                projectile.direction = Vector.Direction(projectile.position, this.target.position);
                 this.projeciles.push(projectile);
                 projectile.target = this.target;
                 this.lastfireTime = currentTime;

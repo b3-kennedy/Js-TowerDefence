@@ -1,6 +1,6 @@
 import Tower from "./tower.js";
-import Vector from "./vector.js";
-import Colours from "./colours.js";
+import Vector from "../vector.js";
+import Colours from "../colours.js";
 
 export default class IceTower extends Tower{
         constructor(canvas, context, game){

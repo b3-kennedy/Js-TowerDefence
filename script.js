@@ -2,15 +2,15 @@ import GridElement from './gridelement.js';
 import Vector from './vector.js';
 import Colours from './colours.js';
 import ShopGridElement from './shopgridelement.js';
-import Tower from './tower.js';
-import LaserTower from './lasertower.js';
-import AttackSpeedTower from './attackspeedtower.js';
-import RocketTower from './rockettower.js';
+import Tower from './towers/tower.js';
+import LaserTower from './towers/lasertower.js';
+import AttackSpeedTower from './towers/attackspeedtower.js';
+import RocketTower from './towers/rockettower.js';
 import WaveSpawner from './wavespawner.js';
-import IceTower from './icetower.js';
-import PierceTower from './piercetower.js';
+import IceTower from './towers/icetower.js';
+import PierceTower from './towers/piercetower.js';
 import InfoPanel from './infopanel.js';
-import SniperTower from './snipertower.js';
+import SniperTower from './towers/snipertower.js';
 
 
 const canvas = document.querySelector('canvas');

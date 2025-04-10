@@ -1,5 +1,5 @@
 import Vector from "./vector.js";
-import Tower from "./tower.js";
+import Tower from "./towers/tower.js";
 
 export default class LaserTower extends Tower{
     constructor(canvas, context, game){

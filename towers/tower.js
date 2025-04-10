@@ -1,5 +1,5 @@
-import Vector from "./vector.js";
-import Projectile from "./projectile.js";
+import Vector from "../vector.js";
+import Projectile from "../projectile.js";
 
 export default class Tower{
     constructor(canvas, context, game){
