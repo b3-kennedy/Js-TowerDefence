@@ -5,6 +5,7 @@ export default class LaserTower extends Tower{
     constructor(canvas, context, game){
         super(canvas, context, game);
         this.baseFireRate = 100;
+        this.fireRate = this.baseFireRate;
         this.name = "Laser Tower";
         this.damage = 0.1;
         this.cost = 500;
@@ -43,6 +44,9 @@ export default class LaserTower extends Tower{
         if (this.isPlaced) {
             fillStyle = 'blue';
             strokeStyle = 'black';
+            if(this.isSelected){
+                this.drawRadius();
+            }
         } else {
             this.drawRadius();
             fillStyle = 'rgba(0, 0, 255, 0.5)';   // red with 50% opacity

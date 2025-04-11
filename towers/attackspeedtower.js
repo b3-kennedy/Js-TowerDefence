@@ -6,6 +6,7 @@ export default class AttackSpeedTower extends Tower{
         super(canvas, context, game);
         this.cost = 200;
         this.isAura = true;
+        this.baseFireRate = 0;
         this.name = "Fire Rate Buff Tower";
         this.description = `Increases the fire rate for all towers within ${this.radius} units`
         this.applyBuff();
@@ -42,6 +43,9 @@ export default class AttackSpeedTower extends Tower{
             if (this.isPlaced) {
                 fillStyle = 'green';
                 strokeStyle = 'black';
+                if(this.isSelected){
+                    this.drawRadius();
+                }
             } else {
                 this.drawRadius();
                 fillStyle = 'rgba(0, 255, 0, 0.5)';   // red with 50% opacity

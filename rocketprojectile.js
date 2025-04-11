@@ -33,7 +33,7 @@ export default class RocketProjectile extends Projectile{
         var enemies = this.game.enemies;
         for (let i = 0; i < enemies.length; i++) {
             var distance = Vector.Distance(this.position, enemies[i].position);
-            if(distance <= this.radius){
+            if(distance <= 50){
                 enemies[i].takeDamage(this.damage);
             }
             

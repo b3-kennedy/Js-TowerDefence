@@ -47,6 +47,9 @@ export default class RocketTower extends Tower{
             fillStyle = 'yellow';
             strokeStyle = 'black';
             this.projeciles.forEach(element => element.draw());
+            if(this.isSelected){
+                this.drawRadius();
+            }
         } else {
             this.drawRadius();
             fillStyle = 'rgba(255, 255, 0, 0.5)';   // yellow with 50% opacity

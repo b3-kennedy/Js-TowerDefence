@@ -15,8 +15,6 @@ export default class Projectile{
 
         this.radius = 3;
 
-        console.log(this.damage);
-
     }
 
     draw(){

@@ -47,6 +47,9 @@ export default class PierceTower extends Tower{
             this.projeciles.forEach(element => element.draw());
             fillStyle = 'pink';
             strokeStyle = 'black';
+            if(this.isSelected){
+                this.drawRadius();
+            }
         } else {
             this.drawRadius();
             fillStyle = 'rgba(255, 105, 180, 0.5)';   // pink with 50% opacity

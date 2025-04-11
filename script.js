@@ -1,5 +1,6 @@
 import GridElement from './gridelement.js';
 import Vector from './vector.js';
+import Helper from './helper.js';
 import Colours from './colours.js';
 import ShopGridElement from './shopgridelement.js';
 import Tower from './towers/tower.js';
@@ -24,9 +25,6 @@ export default class Game
     constructor(width, height, bgColour, canvas, context, gridSize){
         canvas.width = width;
         canvas.height = height;
-
-
-
 
         this.bgColour = bgColour;
         this.canvas = canvas;
@@ -122,8 +120,7 @@ export default class Game
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             this.selectItem(event,x,y, gridXSize, gridYSize);
-
-
+            this.selectPlacedTower(x,y);
         });
         
         canvas.addEventListener('mousemove', (event) => {
@@ -194,6 +191,7 @@ export default class Game
                             var tower = this.selectedItem.clone();
                             tower.isPlaced = true;
                             tower.position = new Vector(gridElement.getCentrePosition().x, gridElement.getCentrePosition().y);
+                            tower.gridPosition = new Vector(i,j);
                             tower.enemies = this.enemies;
                             this.towers.push(tower);
                             this.placer = null;
@@ -225,11 +223,47 @@ export default class Game
         }
     }
 
+    selectPlacedTower(x, y){
+        for(var i = 0; i < this.towers.length; i++){
+            var tower = this.towers[i];
+            var towerX = tower.position.x - tower.width / 2;
+            var towerY = tower.position.y - tower.height;
+
+            //sell tower if button pressed
+            if(this.infoPanel.isButtonHovered && tower.isSelected){
+                console.log("sell " + tower.name);
+                this.grid[tower.gridPosition.x][tower.gridPosition.y].hasTower = false;
+                tower.isActive = false;
+                this.alterMoney(tower.cost/2);
+            }
+
+            if(Helper.isInBox(x, y, towerX, towerY, tower.width, tower.height)){
+                
+                tower.isSelected = true;
+                var info = {name: tower.name, sellPrice: tower.cost/2, currentFireRate: tower.fireRate, currentDamage: tower.damage, range: tower.radius};
+                this.updateInfoPanel(info, false);
+            }else{
+                tower.isSelected = false;
+            }
+            
+
+        }
+    }
+
     updateInfoPanel(info, isShop){
+        this.infoPanel.isShop = isShop;
         if(isShop){
+            
             this.infoPanel.nameText = info.name;
             this.infoPanel.cost = info.cost;
             this.infoPanel.descriptionText = info.description;
+        }else{
+            this.infoPanel.nameText = info.name;
+            this.infoPanel.sell = info.sellPrice;
+            this.infoPanel.fireRateText = info.currentFireRate/1000;
+            this.infoPanel.damageText = info.currentDamage.toString();
+            this.infoPanel.rangeText = info.range.toString();
+
         }
 
     }
@@ -398,7 +432,7 @@ export default class Game
         requestAnimationFrame(this.update);
         c.clearRect(0,0, canvas.width, canvas.height);
         this.enemies = this.enemies.filter(element => !element.isDead);
-
+        this.towers = this.towers.filter(element => element.isActive);
         this.waveSpawner.update(deltaTime);
 
         if(this.placer){
@@ -417,6 +451,8 @@ export default class Game
         this.towers.forEach(element => {element.update(deltaTime)});
 
         this.shopGrid.flat().forEach(element => {element.update(deltaTime)});
+
+        this.infoPanel.update();
     
         this.draw();
     }

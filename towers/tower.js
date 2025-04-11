@@ -5,6 +5,7 @@ export default class Tower{
     constructor(canvas, context, game){
         this.canvas = canvas;
         this.position = new Vector(0,0);
+        this.gridPosition = new Vector(0,0);
         this.c = context;
         this.width = 25;
         this.height = 40;
@@ -23,6 +24,8 @@ export default class Tower{
         this.description = `Fires a projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
         this.isPlaced = false;
         this.projectileSpeed = 500;
+        this.isSelected = false;
+        this.isActive = true;
 
         }
 
@@ -46,6 +49,7 @@ export default class Tower{
     }
 
     draw(){
+        if(!this.isActive) return;
 
         const halfWidth = this.width / 2;
         const topLeftX = this.position.x - halfWidth;
@@ -57,12 +61,19 @@ export default class Tower{
             this.projeciles.forEach(element => element.draw());
             fillStyle = 'red';
             strokeStyle = 'black';
+
+            if(this.isSelected){
+                this.drawRadius();
+            }
+
         } else {
             this.drawRadius();
             fillStyle = 'rgba(255, 0, 0, 0.5)';   // red with 50% opacity
             strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
             
         }
+
+
 
         
         this.c.fillStyle = fillStyle;
@@ -77,7 +88,7 @@ export default class Tower{
 
     drawRadius(){
         this.c.beginPath();
-        this.c.arc(this.position.x,this.position.y, this.radius, 0, 360, false);
+        this.c.arc(this.position.x,this.position.y, this.radius, 0, Math.PI * 2, false);
         this.c.fillStyle = 'rgba(0,0,0,0.25)';
         this.c.fill();
     }
@@ -105,9 +116,10 @@ export default class Tower{
 
     update(deltaTime){
 
+        if(!this.isActive) return;
+
         const currentTime = Date.now();
         if(currentTime - this.lastfireTime >= this.fireRate){
-
             this.getTarget();
             if(this.target){
                 

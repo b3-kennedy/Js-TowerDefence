@@ -41,6 +41,9 @@ export default class IceTower extends Tower{
             if (this.isPlaced) {
                 fillStyle = Colours.iceColour;
                 strokeStyle = 'black';
+                if(this.isSelected){
+                    this.drawRadius();
+                }
             } else {
                 this.drawRadius();
                 fillStyle = 'rgba(191, 255, 254,0.5)';   // red with 50% opacity

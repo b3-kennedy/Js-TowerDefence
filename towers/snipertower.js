@@ -50,6 +50,9 @@ export default class SniperTower extends Tower{
             fillStyle = 'brown';  // Change to brown
             strokeStyle = 'black';
             this.projeciles.forEach(element => element.draw());
+            if(this.isSelected){
+                this.drawRadius();
+            }
         } else {
             this.drawRadius();
             fillStyle = 'rgba(139, 69, 19, 0.5)';  // brown with 50% opacity

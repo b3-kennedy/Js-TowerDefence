@@ -1,6 +1,12 @@
 export default class Text{
 
-    static boxWrap(ctx, text, x, y, width, height, lineHeight){
+    static boxWrap(ctx, text, x, y, width, height, lineHeight, colour, fontSize, align, baseline){
+
+        ctx.fillStyle = colour;
+        ctx.font = `${fontSize}px Arial`;
+        ctx.textAlign = align;
+        ctx.textBaseline = baseline;
+
         const words = text.split(' ');
         let line = '';
         let currentY = y;
