@@ -6,6 +6,7 @@ export default class IceTower extends Tower{
         constructor(canvas, context, game){
             super(canvas, context, game);
             this.baseFireRate = 3000;
+            this.radius = this.baseRadius
             this.name = "Ice Tower";
             this.damage = 0;
             this.cost = 250;

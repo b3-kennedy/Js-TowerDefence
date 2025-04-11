@@ -1,7 +1,7 @@
 import Vector from "../vector.js";
 import Tower from "./tower.js";
 
-export default class AttackSpeedTower extends Tower{
+export default class RangeTower extends Tower{
     constructor(canvas, context, game){
         super(canvas, context, game);
         this.cost = 200;
@@ -9,16 +9,17 @@ export default class AttackSpeedTower extends Tower{
         this.baseFireRate = 0;
         this.baseRadius = 50;
         this.radius = this.baseRadius;
+        this.radiusIncrease = 50;
         this.damage = 0;
-        this.name = "Fire Rate Buff Tower";
-        this.description = `Increases the fire rate for all towers within ${this.radius} units`
+        this.name = "Range Buff Tower";
+        this.description = `Increases the range for all towers within ${this.radius} units`
         this.applyBuff();
         
     }
 
     clone()
     {
-        const clone = new AttackSpeedTower(this.canvas, this.c, this.game);
+        const clone = new RangeTower(this.canvas, this.c, this.game);
 
         clone.position = new Vector(this.position.x, this.position.y);
         clone.width = this.width;
@@ -44,15 +45,15 @@ export default class AttackSpeedTower extends Tower{
         let fillStyle, strokeStyle;
     
         if (this.isPlaced) {
-            fillStyle = 'green';
+            fillStyle = 'orange';
             strokeStyle = 'black';
-            if(this.isSelected){
+            if (this.isSelected) {
                 this.drawRadius();
             }
         } else {
             this.drawRadius();
-            fillStyle = 'rgba(0, 255, 0, 0.5)';   // red with 50% opacity
-            strokeStyle = 'rgba(0, 0, 0, 0.5)';   // black with 50% opacity
+            fillStyle = 'rgba(255, 165, 0, 0.5)';   // orange with 50% opacity
+            strokeStyle = 'rgba(0, 0, 0, 0.5)';     // black with 50% opacity
         }
     
         this.c.fillStyle = fillStyle;
@@ -74,8 +75,10 @@ export default class AttackSpeedTower extends Tower{
         var inRangeTowers = []
         for (let i = 0; i < towers.length; i++) {
             var distance = Vector.Distance(this.position, towers[i].position);
-            if(distance <= this.radius){
+            if(distance <= this.radius && towers[i] != this){
                 inRangeTowers.push(towers[i]);
+            }else{
+                towers[i].isRangeBuffed = false;
             }
             
         }
@@ -90,7 +93,8 @@ export default class AttackSpeedTower extends Tower{
         }
 
         for(let i = 0; i < towers.length; i++){
-            towers[i].fireRate = towers[i].baseFireRate / 2;
+            towers[i].radius = towers[i].baseRadius + this.radiusIncrease;
+            towers[i].isRangeBuffed = true;
         }
     }
 
@@ -110,7 +114,7 @@ export default class AttackSpeedTower extends Tower{
     onDestroy(){
         var towers = this.getTargets();
         for(let i = 0; i < towers.length; i++){
-            towers[i].fireRate = towers[i].baseFireRate;
+            towers[i].radius = towers[i].baseRadius;
         }
     }
 }

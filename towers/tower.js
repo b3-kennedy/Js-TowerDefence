@@ -14,9 +14,11 @@ export default class Tower{
         this.fireRate = this.baseFireRate;
         this.enemies = [];
         this.target = null;
+        this.isRangeBuffed = false;
         this.game = game;
         this.damage = 1;
-        this.radius = 150;
+        this.baseRadius = 150;
+        this.radius = this.baseRadius;
         this.projeciles = [];
         this.name = "Tower";
         this.cost = 100;
@@ -93,16 +95,20 @@ export default class Tower{
         this.c.fill();
     }
 
-    getTarget(){
+    getTarget() {
         let enemies = this.game.enemies;
-        if (enemies.length === 0) {
+    
+        if (this.target && this.target.isDead) {
             this.target = null;
+        }
+    
+        if (this.target && Vector.Distance(this.position, this.target.position) < this.radius) {
             return;
         }
-
+    
         let closestEnemy = null;
         let closestDistance = Infinity;
-
+    
         for (let enemy of enemies) {
             let distance = Vector.Distance(this.position, enemy.position);
             if (distance < this.radius && distance < closestDistance) {
@@ -110,7 +116,7 @@ export default class Tower{
                 closestEnemy = enemy;
             }
         }
-
+    
         this.target = closestEnemy;
     }
 
@@ -139,5 +145,9 @@ export default class Tower{
         this.projeciles.forEach(element => {
             element.update(deltaTime);
         });
+    }
+
+    onDestroy(){
+
     }
 }

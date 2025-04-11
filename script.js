@@ -12,6 +12,7 @@ import IceTower from './towers/icetower.js';
 import PierceTower from './towers/piercetower.js';
 import InfoPanel from './infopanel.js';
 import SniperTower from './towers/snipertower.js';
+import RangeTower from './towers/rangetower.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -101,6 +102,7 @@ export default class Game
             new IceTower(this.canvas, this.c, this),
             new PierceTower(this.canvas, this.c, this),
             new SniperTower(this.canvas, this.c, this),
+            new RangeTower(this.canvas, this.c, this),
         ];
 
         for (let i = 0; i < gridYSize; i++) {
@@ -194,6 +196,7 @@ export default class Game
                             tower.gridPosition = new Vector(i,j);
                             tower.enemies = this.enemies;
                             this.towers.push(tower);
+                            this.towers.sort((a, b) => a.gridPosition.y - b.gridPosition.y);
                             this.placer = null;
                             this.updateAuraTowers();
                             gridElement.hasTower = true;
@@ -235,6 +238,7 @@ export default class Game
                 this.grid[tower.gridPosition.x][tower.gridPosition.y].hasTower = false;
                 tower.isActive = false;
                 this.alterMoney(tower.cost/2);
+                tower.onDestroy();
             }
 
             if(Helper.isInBox(x, y, towerX, towerY, tower.width, tower.height)){

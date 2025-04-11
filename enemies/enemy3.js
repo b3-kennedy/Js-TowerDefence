@@ -1,26 +1,26 @@
 import Enemy from "./enemy.js";
-import Vector from "./vector.js";
+import Vector from "../vector.js";
 
 export default class Enemy3 extends Enemy{
     constructor(canvas, context, waypoints, drawingArea, game){
-            super(canvas, context, waypoints, drawingArea, game);
-            this.position = new Vector(0,0);
-            this.canvas = canvas;
-            this.c = context;
-            this.waypoints = waypoints;
-            this.velocity = new Vector(1,0);
-            this.target = this.waypoints[1];
-            this.waypointIndex = 1;
-            this.baseSpeed = 200;
-            this.speed = this.baseSpeed;
-            this.finalDir = new Vector(1,0);
-            this.isDead = false;
-            this.drawingArea = drawingArea;
-            this.game = game;
-            this.health = 3;
-            this.bounty = 100;
-            this.damageToPlayer = 1;
-        }
+        super(canvas, context, waypoints, drawingArea, game);
+        this.position = new Vector(0,0);
+        this.canvas = canvas;
+        this.c = context;
+        this.waypoints = waypoints;
+        this.velocity = new Vector(1,0);
+        this.target = this.waypoints[1];
+        this.waypointIndex = 1;
+        this.baseSpeed = 200;
+        this.speed = this.baseSpeed;
+        this.finalDir = new Vector(1,0);
+        this.isDead = false;
+        this.drawingArea = drawingArea;
+        this.game = game;
+        this.health = 3;
+        this.bounty = 100;
+        this.damageToPlayer = 1;
+    }
     
     takeDamage(damage){
         this.health -= damage;

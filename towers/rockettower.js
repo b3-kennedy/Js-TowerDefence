@@ -6,6 +6,7 @@ export default class RocketTower extends Tower{
     constructor(canvas, context, game){
         super(canvas, context, game);
         this.baseFireRate = 2000;
+        this.radius = this.baseRadius;
         this.name = "Rocket Tower";
         this.damage = 1;
         this.cost = 250;

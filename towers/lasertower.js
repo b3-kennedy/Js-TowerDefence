@@ -6,6 +6,7 @@ export default class LaserTower extends Tower{
         super(canvas, context, game);
         this.baseFireRate = 100;
         this.fireRate = this.baseFireRate;
+        this.radius = this.baseRadius;
         this.name = "Laser Tower";
         this.damage = 0.1;
         this.cost = 500;

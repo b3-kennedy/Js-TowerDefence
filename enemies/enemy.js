@@ -1,4 +1,4 @@
-import Vector from './vector.js';
+import Vector from '../vector.js';
 
 export default class Enemy{
     constructor(canvas, context, waypoints, drawingArea, game){

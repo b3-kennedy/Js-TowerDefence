@@ -8,6 +8,7 @@ export default class PierceTower extends Tower{
         super(canvas, context, game);
         this.baseFireRate = 3000;
         this.name = "Pierce Tower";
+        this.radius = this.baseRadius;
         this.damage = 1;
         this.cost = 250;
         this.height = 50;

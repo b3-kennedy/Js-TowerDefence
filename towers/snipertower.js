@@ -12,7 +12,8 @@ export default class SniperTower extends Tower{
         this.cost = 250;
         var seconds = this.baseFireRate /1000;
         this.description = `Fires a projectile every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
-        this.radius = 500;
+        this.baseRadius = 500;
+        this.radius = this.baseRadius;
         this.projectileSpeed = 1000;
     }
 

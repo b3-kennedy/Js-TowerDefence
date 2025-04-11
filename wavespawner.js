@@ -1,6 +1,7 @@
-import Enemy from "./enemy.js";
-import Enemy2 from "./enemy2.js";
-import Enemy3 from "./enemy3.js";
+import Enemy from "./enemies/enemy.js";
+import Enemy2 from "./enemies/enemy2.js";
+import Enemy3 from "./enemies/enemy3.js";
+import TankEnemy from "./enemies/tankenemy.js";
 import Vector from "./vector.js";
 
 
@@ -37,6 +38,8 @@ export default class WaveSpawner{
             new Wave(15, 1, {enemy1: 50, enemy2: 50}),
             new Wave(20, 1, {enemy1: 20, enemy2: 20, enemy3: 60}),
             new Wave(25, 0.5, {enemy1: 20, enemy2: 20, enemy3: 60}),
+            new Wave(30, 1, {tank: 50, enemy1: 50}),
+            
         ];
     }
 
@@ -95,6 +98,10 @@ export default class WaveSpawner{
                     case "enemy3":
                         enemy = new Enemy3(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
                         break;
+                    case "tank":
+                        enemy = new TankEnemy(this.canvas, this.c, this.game.waypoints, this.game.drawingArea, this.game);
+                        break;
+
                 }
     
                 enemy.position = new Vector(
