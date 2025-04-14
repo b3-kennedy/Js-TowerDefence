@@ -7,8 +7,8 @@ export default class SoundManager{
         var sounds = {
             shoot: './sound/shoot.mp3',
             song: './sound/song.mp3',
-            test: './sound/sus-meme-sound-181271.mp3',
-            test2: './sound/yeah-boy-114748.mp3'
+            laser: './sound/laser.mp3',
+            click: './sound/click.mp3'
         };
 
         for (const [key, value] of Object.entries(sounds)) {
@@ -29,6 +29,14 @@ export default class SoundManager{
             file.volume = volume;
             file.loop = loop;
             file.play();
+        }
+    }
+
+
+    stopAudio(name) {
+        if (this.audioFiles[name]) {
+            this.audioFiles[name].pause();
+            this.audioFiles[name].currentTime = 0;
         }
     }
 

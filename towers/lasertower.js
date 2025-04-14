@@ -1,3 +1,4 @@
+import SoundManager from "../soundmanager.js";
 import Vector from "../vector.js";
 import Tower from "./tower.js";
 
@@ -11,6 +12,7 @@ export default class LaserTower extends Tower{
         this.damage = 0.1;
         this.cost = 500;
         var seconds = this.baseFireRate/1000;
+        this.soundManager = new SoundManager(game);
         this.description = `Fires a laser which deals damage every ${seconds} ${seconds === 1 ? 'second' : 'seconds'}, this tower will target the closest enemy`;
     }
 
@@ -86,11 +88,19 @@ export default class LaserTower extends Tower{
 
     update(deltaTime){
         const currentTime = Date.now();
+
+        if(!this.target){
+            console.log("no target");
+            this.soundManager.stopAudio('laser');
+        }
+
         if(currentTime - this.lastfireTime >= this.fireRate){
 
             this.getTarget();
             if(this.target){
                 
+                this.soundManager.playAudio('laser', true, 0.01);
+
                 if(Vector.Distance(this.target.position, this.position) > this.radius){
                     this.target = null;
                 }

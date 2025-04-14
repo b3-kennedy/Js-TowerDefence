@@ -44,7 +44,7 @@ export default class Game
         this.selectedTower = null;
         this.money = 500;
         this.waveStarted = false;
-        this.health = 2;
+        this.health = 100;
         this.mousePosition = new Vector(0,0);
         this.gridMousePosition = new Vector(0,0);
         this.isGameOver = false;
@@ -112,6 +112,7 @@ export default class Game
         this.createPath();
         this.createEnemy();
         this.createShop();
+        this.events();
         this.update = this.update.bind(this);
         requestAnimationFrame(this.update);
     }
@@ -152,6 +153,7 @@ export default class Game
             const y = event.clientY - rect.top;
             this.selectItem(event,x,y, gridXSize, gridYSize);
             this.selectPlacedTower(x,y);
+            this.soundManager.playAudio('click', false, 0.05);
             if(this.state == this.gameState.END && this.gameOverPanel.isButtonHovered){
                 console.log("restart button pressed");
                 this.reset();
@@ -370,6 +372,30 @@ export default class Game
                 }
             });
         });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                this.placer = null;
+                this.selectedItem = null;
+                for(var i = 0; i < this.towers.length; i++){
+                    if(this.towers[i].isSelected){
+                        this.towers[i].isSelected = false;
+                    }
+                }
+                var shop = this.shopGrid.flat();
+                for(var i =0; i < shop.length; i++){
+                    if(shop[i].isSelected){
+                        shop[i].isSelected = false;
+                    }
+                }
+                
+            }
+        });
+
+    }
+
+    events(){
+
     }
 
     createPath() {
@@ -427,14 +453,15 @@ export default class Game
         var gridX = this.gridMousePosition.x;
         var gridY = this.gridMousePosition.y;
         //only draw the placer if the mouse is on the game and not on a path square
-        if(this.mouseOnGame && gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath && this.placer){
-            this.placer.draw()
+        if(this.placer){
+            //console.log(this.placer);
+            if(this.mouseOnGame && gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath){
+                this.placer.draw()
+            }
         }
-        
 
-        if(!this.waveSpawner.isSpawning){
-            this.waveSpawner.draw();
-        }
+
+        this.waveSpawner.draw();
         
 
         this.c.font = "30px Arial";  // Font size and type
@@ -457,6 +484,8 @@ export default class Game
         this.healthBar.draw();
         this.infoPanel.draw();
     }
+
+
 
     
 
