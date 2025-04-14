@@ -15,6 +15,8 @@ import SniperTower from './towers/snipertower.js';
 import RangeTower from './towers/rangetower.js';
 import HealthBar from './healthbar.js';
 import GameOverPanel from './gameoverpanel.js';
+import SoundManager from './soundmanager.js';
+import StartPanel from './startpanel.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -49,6 +51,9 @@ export default class Game
         
         this.lastTime = performance.now();
         this.mouseOnGame = false;
+
+        this.gameState = {PRE: 'PRE', PLAY:'PLAY', END:'END'};
+        this.state = this.gameState.PRE;
 
         
 
@@ -93,6 +98,8 @@ export default class Game
         this.infoPanel = new InfoPanel(this.canvas, this.c, this, this.infoPanelDimensions);
         this.healthBar = new HealthBar(this.canvas, this.c, this, this.healthBarDimensions);
         this.gameOverPanel = new GameOverPanel(this.canvas, this.c, this, this.gameOverDimensions);
+        this.startPanel = new StartPanel(this.canvas, this.c,this, this.gameOverDimensions);
+        this.soundManager = new SoundManager(this);
 
         this.width = this.drawingArea.width;
         this.height = this.drawingArea.height;
@@ -101,7 +108,6 @@ export default class Game
     }
 
     start(){
-
         this.createGrid();
         this.createPath();
         this.createEnemy();
@@ -146,10 +152,14 @@ export default class Game
             const y = event.clientY - rect.top;
             this.selectItem(event,x,y, gridXSize, gridYSize);
             this.selectPlacedTower(x,y);
-            if(this.isGameOver && this.gameOverPanel.isButtonHovered){
+            if(this.state == this.gameState.END && this.gameOverPanel.isButtonHovered){
                 console.log("restart button pressed");
                 this.reset();
+            }else if(this.state == this.gameState.PRE && this.startPanel.isButtonHovered){
+                this.state = this.gameState.PLAY;
+                this.soundManager.playAudio('song', true, 0.02);
             }
+            
         });
         
         canvas.addEventListener('mousemove', (event) => {
@@ -448,13 +458,15 @@ export default class Game
         this.infoPanel.draw();
     }
 
-    damagePlayer(damage){
+    
 
+    damagePlayer(damage){
+        this.health -= damage;
         if(this.health <= 0){
             console.log("GAME OVER");
+            this.state = this.gameState.END;
             this.isGameOver = true;
         }else{
-            this.health -= damage;
             var healthPercent = this.health/100;
             this.healthHeight = this.healthBarDimensions.height * healthPercent;
             console.log(`Player Health: ${this.health}`);
@@ -464,45 +476,53 @@ export default class Game
     update(currentTime){
 
         requestAnimationFrame(this.update);
-        if(this.isGameOver){
+        if(this.state == this.gameState.END){
             //freeze game and draw gameover panel
             this.gameOverPanel.update();
             this.gameOverPanel.draw();
 
             return
-        }
+        }else if(this.state == this.gameState.PLAY){
+            let deltaTime = (currentTime - this.lastTime) / 1000;
 
-        let deltaTime = (currentTime - this.lastTime) / 1000;
-
-        deltaTime = Math.min(deltaTime, 0.1); //limits deltaTime so when tabbed out the enemies dont have irrational movement
-
-        this.lastTime = currentTime;
-        
-        c.clearRect(0,0, canvas.width, canvas.height);
-        this.enemies = this.enemies.filter(element => !element.isDead);
-        this.towers = this.towers.filter(element => element.isActive);
-        this.waveSpawner.update(deltaTime);
-
-        if(this.placer){
-            var gridX = this.gridMousePosition.x;
-            var gridY = this.gridMousePosition.y;
-            if(gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath){
-                this.placer.position = this.grid[gridX][gridY].getCentrePosition();
-            }
-            
-        }
-
-        this.enemies.forEach(element => {
-            element.update(deltaTime);
-        });
-
-        this.towers.forEach(element => {element.update(deltaTime)});
-
-        this.shopGrid.flat().forEach(element => {element.update(deltaTime)});
-
-        this.infoPanel.update();
+            deltaTime = Math.min(deltaTime, 0.1); //limits deltaTime so when tabbed out the enemies dont have irrational movement
     
-        this.draw();
+            this.lastTime = currentTime;
+            
+            c.clearRect(0,0, canvas.width, canvas.height);
+            this.enemies = this.enemies.filter(element => !element.isDead);
+            this.towers = this.towers.filter(element => element.isActive);
+            this.waveSpawner.update(deltaTime);
+    
+            if(this.placer){
+                var gridX = this.gridMousePosition.x;
+                var gridY = this.gridMousePosition.y;
+                if(gridX > -1 && gridY > -1 && !this.grid[gridX][gridY].isPath){
+                    this.placer.position = this.grid[gridX][gridY].getCentrePosition();
+                }
+                
+            }
+    
+            this.enemies.forEach(element => {
+                element.update(deltaTime);
+            });
+    
+            this.towers.forEach(element => {element.update(deltaTime)});
+    
+            this.shopGrid.flat().forEach(element => {element.update(deltaTime)});
+    
+            this.infoPanel.update();
+        
+            this.draw();
+        }else if(this.state == this.gameState.PRE){
+            this.startPanel.update();
+            this.draw();
+            this.startPanel.draw();
+            
+
+        }
+
+
     }
 
     reset(){

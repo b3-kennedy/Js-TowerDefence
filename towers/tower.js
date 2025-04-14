@@ -1,5 +1,6 @@
 import Vector from "../vector.js";
 import Projectile from "../projectile.js";
+import SoundManager from "../soundmanager.js";
 
 export default class Tower{
     constructor(canvas, context, game){
@@ -28,6 +29,7 @@ export default class Tower{
         this.projectileSpeed = 500;
         this.isSelected = false;
         this.isActive = true;
+        this.soundManager = new SoundManager(game);
 
         }
 
@@ -132,7 +134,7 @@ export default class Tower{
                 if(Vector.Distance(this.target.position, this.position) > this.radius){
                     this.target = null;
                 }
-
+                this.soundManager.playOneShot("shoot", 0.02);
                 var projectile = new Projectile(this.canvas, this.c, this.damage, this.projectileSpeed);
                 projectile.position = new Vector(this.position.x, this.position.y - this.height);
                 this.projeciles.push(projectile);
