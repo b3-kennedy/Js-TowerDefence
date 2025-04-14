@@ -44,7 +44,7 @@ export default class Game
         this.selectedTower = null;
         this.money = 500;
         this.waveStarted = false;
-        this.health = 100;
+        this.health = 1; 
         this.mousePosition = new Vector(0,0);
         this.gridMousePosition = new Vector(0,0);
         this.isGameOver = false;
@@ -555,8 +555,14 @@ export default class Game
     }
 
     reset(){
-        var newGame = new Game(1010, 1010, 'lightblue', canvas, c, 17);
-        newGame.start();
+        this.health = 100;
+        this.towers = [];
+        this.enemies = [];
+        this.waveSpawner.waveNumber = 0;
+        this.state = this.gameState.PLAY;
+        this.money = 500;
+        this.placer = null;
+
 
     }
 }
