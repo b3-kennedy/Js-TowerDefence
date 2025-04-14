@@ -34,10 +34,10 @@ export default class WaveSpawner{
     setupWaves(){
 
         this.waves = [
+            new Wave(25, 0.5, {enemy1: 20, enemy2: 20, enemy3: 60}),
             new Wave(10, 1, {enemy1: 100}),
             new Wave(15, 1, {enemy1: 50, enemy2: 50}),
             new Wave(20, 1, {enemy1: 20, enemy2: 20, enemy3: 60}),
-            new Wave(25, 0.5, {enemy1: 20, enemy2: 20, enemy3: 60}),
             new Wave(30, 1, {tank: 50, enemy1: 50}),
             
         ];

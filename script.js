@@ -13,6 +13,8 @@ import PierceTower from './towers/piercetower.js';
 import InfoPanel from './infopanel.js';
 import SniperTower from './towers/snipertower.js';
 import RangeTower from './towers/rangetower.js';
+import HealthBar from './healthbar.js';
+import GameOverPanel from './gameoverpanel.js';
 
 
 const canvas = document.querySelector('canvas');
@@ -40,12 +42,15 @@ export default class Game
         this.selectedTower = null;
         this.money = 500;
         this.waveStarted = false;
-        this.health = 100;
+        this.health = 2;
         this.mousePosition = new Vector(0,0);
         this.gridMousePosition = new Vector(0,0);
+        this.isGameOver = false;
         
         this.lastTime = performance.now();
         this.mouseOnGame = false;
+
+        
 
         this.shopArea = {
             x: 55,
@@ -69,7 +74,25 @@ export default class Game
             height: 100            
         };
 
+        this.healthBarDimensions = {
+            x: this.canvas.width-154,
+            y: 155,
+            width: 30,
+            height: this.drawingArea.height + this.infoPanelDimensions.height+1,
+        };
+
+        this.gameOverDimensions = {
+            x: this.drawingArea.x + (this.drawingArea.width / 2) - (300 / 2),
+            y: this.drawingArea.y + (this.drawingArea.height / 2) - (200 / 2),
+            width: 300,
+            height: 200
+        }
+
+        this.healthHeight = this.healthBarDimensions.height;
+
         this.infoPanel = new InfoPanel(this.canvas, this.c, this, this.infoPanelDimensions);
+        this.healthBar = new HealthBar(this.canvas, this.c, this, this.healthBarDimensions);
+        this.gameOverPanel = new GameOverPanel(this.canvas, this.c, this, this.gameOverDimensions);
 
         this.width = this.drawingArea.width;
         this.height = this.drawingArea.height;
@@ -123,6 +146,10 @@ export default class Game
             const y = event.clientY - rect.top;
             this.selectItem(event,x,y, gridXSize, gridYSize);
             this.selectPlacedTower(x,y);
+            if(this.isGameOver && this.gameOverPanel.isButtonHovered){
+                console.log("restart button pressed");
+                this.reset();
+            }
         });
         
         canvas.addEventListener('mousemove', (event) => {
@@ -408,32 +435,49 @@ export default class Game
         // c.fillRect(this.shopArea.x, this.shopArea.y, this.shopArea.width, this.shopArea.height);
         
         //info panel
-        c.fillStyle = this.bgColour;
-        c.fillRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height);
+        this.c.fillStyle = this.bgColour;
+        this.c.fillRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height);
 
         this.c.strokeStyle = 'black';
         this.c.borderWidth = 2;
-        this.c.strokeRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height)
+        this.c.strokeRect(this.infoPanel.x, this.infoPanel.y, this.infoPanel.width, this.infoPanel.height);
 
+
+
+        this.healthBar.draw();
         this.infoPanel.draw();
     }
 
     damagePlayer(damage){
-        this.health -= damage;
-        console.log(`Player Health: ${this.health}`);
+
         if(this.health <= 0){
             console.log("GAME OVER");
+            this.isGameOver = true;
+        }else{
+            this.health -= damage;
+            var healthPercent = this.health/100;
+            this.healthHeight = this.healthBarDimensions.height * healthPercent;
+            console.log(`Player Health: ${this.health}`);
         }
     }
 
     update(currentTime){
+
+        requestAnimationFrame(this.update);
+        if(this.isGameOver){
+            //freeze game and draw gameover panel
+            this.gameOverPanel.update();
+            this.gameOverPanel.draw();
+
+            return
+        }
 
         let deltaTime = (currentTime - this.lastTime) / 1000;
 
         deltaTime = Math.min(deltaTime, 0.1); //limits deltaTime so when tabbed out the enemies dont have irrational movement
 
         this.lastTime = currentTime;
-        requestAnimationFrame(this.update);
+        
         c.clearRect(0,0, canvas.width, canvas.height);
         this.enemies = this.enemies.filter(element => !element.isDead);
         this.towers = this.towers.filter(element => element.isActive);
@@ -459,6 +503,12 @@ export default class Game
         this.infoPanel.update();
     
         this.draw();
+    }
+
+    reset(){
+        var newGame = new Game(1010, 1010, 'lightblue', canvas, c, 17);
+        newGame.start();
+
     }
 }
 
